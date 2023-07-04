@@ -47,13 +47,14 @@ class chessGame {
         this.board = newBoard;
         
         this.selected = null; //Will fill with clicked on piece. selected.legalMoves will help display possible.
+        this.selectedMoves = []; //will fill with legal moves of selected piece.
 
         this.pieces = []; //a list of pieces. Pieces are themselves classes with positions already built in.
         this.piecesWhite = []; //may also want separate arrays, 1 for white, 1 black.
         this.piecesBlack = [];
         
         this.prevStart = []; //previous piece, prior to it moving.
-        this.prevFinish = []; //previous piece, after it moved.
+        this.prevDest = []; //previous piece, after it moved.
 
         //Idea for check is to try a move for legality, then check through all opponents moves: if one leads to capture of king, invalid move.
     }
@@ -72,50 +73,58 @@ class chessGame {
         this.getAllLegalMoves();
     }
 
-    movePiece(startPos, finishPos){
+    movePiece(destRow, destCol){
+        //movePiece(startPos, destPos){
         //Checks:
             // if piece exists at startPos
-            // if piece has a legal move at finishPos
+            // if piece has a legal move at destPos
         //If checks pass, make a new piece and update its position fields.
         //Then, update board
             //delete old piece, add new piece
             //update piecesLists, recalculate legal moves for each piece on board.
 
-        let [startRow, startCol] = startPos;
-        let [finishRow, finishCol] = finishPos;
-        let currPiece = this.board[startRow][startCol];
-
-        if (!currPiece){ // does piece exists at startPos
+        let selectedPiece = this.selected;
+        if (!selectedPiece){ // do we have a piece to move to destPos?
             console.log('no piece present');
-            return currPiece; //undefined.
+            return selectedPiece; //undefined.
         }
-        
-        let validMove = false; //check if currPiece's legalMoves array contains finishPos;
-        for (let i = 0; i < currPiece.legalMoves.length; i++){
-            let [currRow, currCol] = currPiece.legalMoves[i];
-            if (currRow == finishRow && currCol == finishCol){
+        let [startRow, startCol] = [selectedPiece.row, selectedPiece.col];
+        //let [destRow, destCol] = destPos;
+
+
+        let validMove = selectedPiece.isValidMove(destRow, destCol);
+        /*
+        let validMove = false; //check if selectedPiece's legalMoves array contains destPos;
+        for (let i = 0; i < this.selectedMoves.length; i++){
+            let [currRow, currCol] = this.selectedMoves[i];
+            if (currRow == destRow && currCol == destCol){
                 validMove = true;
                 break;
             }
         }
+        */
         if (!validMove){
             console.log('not a valid move! returning currPiece legalMoves');
-            return currPiece.legalMoves;
+            return selectedPiece.legalMoves;
         }
 
         //Cloning a class Object is messy. Object.assign gets everything except methods of original,
         //So we get those by making the 'target' of the assign a new object
         //(.create) with the prototype of the original.
-        let newPiece = Object.assign(Object.create(Object.getPrototypeOf(currPiece)), currPiece); 
-        newPiece.updatePos(finishRow, finishCol);
+        let newPiece = Object.assign(Object.create(Object.getPrototypeOf(selectedPiece)), selectedPiece); 
+        newPiece.updatePos(destRow, destCol);
         
         //Update game's previous move properties with pre + post move positions
-        this.prevStart.push(currPiece);
-        this.prevFinish.push(newPiece);
+        this.prevStart.push(selectedPiece);
+        this.prevDest.push(newPiece);
 
-        //Update game board + recalculate legal moves.
+        //Update game board, clear selection, and recalculate legal moves.
         this.board[startRow][startCol] = undefined;
-        this.board[finishRow][finishCol] = newPiece;
+        this.board[destRow][destCol] = newPiece;
+
+        this.selected = null;
+        this.selectedMoves = [];
+
         this.updatePiecesList();
         this.getAllLegalMoves();
     }
@@ -157,10 +166,21 @@ class chessPiece {
         this.moved = 0;
         this.legalMoves = [];
     }
-    updatePos(newRow, newCol){
-        this.row = newRow;
-        this.col = newCol;
+    updatePos(destRow, destCol){
+        this.row = destRow;
+        this.col = destCol;
         this.moved = this.moved + 1;
+    }
+    isValidMove(destRow, destCol){
+        let validMove = false; //check if Piece's legalMoves array contains destPos;
+        for (let i = 0; i < this.legalMoves.length; i++){
+            let [currRow, currCol] = this.legalMoves[i];
+            if (currRow == destRow && currCol == destCol){
+                validMove = true;
+                break;
+            }
+        }
+        return validMove;
     }
 }
 

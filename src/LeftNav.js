@@ -33,7 +33,7 @@ function LeftNav(){
                 <div className="navbase navsignup">Sign Up</div>
                 <div className="navbase navlogin">Log In</div>
             </div>
-            <div className="leftnavextra">
+            <div className="leftnav-extra">
                 <div className="extraplay playperson">Play Person</div>
                 <div className="extraplay playcomp">Play Computer</div>
                 <div className="extraplay playvariants">Play Variants</div>

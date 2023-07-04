@@ -9,53 +9,16 @@ import {chessGame, chessPiece, rook} from "./gamepieces.js"
 function App() {
   /*
   //Still to do:
-    //Need to get more into State. Probably need to have gameState as its own thing or as a Ref.
-    //From that, need to pass in game to boardJSX so it can access 'selected' property of game class.
-      //selected class needs to be added to one square, legal-move needs to be added to multiple squares if a piece is selected.
-
+  //Revert image src="" method for displaying which piece is present.
+    //As is, 'capture' background-image and piece background-image cover each other.
   //Improvements:
-    //could have CSS classes for displaying pieces. Then don't have to redraw img src on each.
     //Could update gamepieces.js to standardize possible moves.
-    //currently images are living in two spots. LeftNav uses public/icons, piece imgs are from src/icons/pieces.
-      //clean up folders so they are non-redundant. Make their names less confusing?
+    //currently images are living in two spots. LeftNav uses public/icons, piece imgs are from src/piece-icons.
 
   //Board
-  Currently need to work out how to set up board interactivity
-    Should be able to click on individual pieces AND individual spots on board.
-    Individual spots implies a large board state
-      JSX to make a series of square components within a board grid.
-        squares should have: row + col, whether or not they have a piece (possMove highlights?)
+  //Pieces are moving, selection's working ok. Need to test other pieces.
 
-  //What happens when you click on a piece?
-    //Square is highlighted
-    //possible moves are highlighted w/ circle. If piece capture highlight border.
-      //If clicking a possible move
-        //and it's a capture
-          //Update board. remove my piece from previous position + insert at new
-            //remove enemy piece from new
-        //and it's not a capture
-          //Update board: remove my piece from previous position + insert at new
-      //If clicking one of your pieces
-        //switch selected to new piece + highlight new moves
-      //If clicking an empty square or an enemy piece
-        //unselect
-      //If clicking same piece again
-        //unselect
-  
-  //From above, it looks like we need more things on chessGame class.
-    //selected piece would be helpful (which will have possible moves which we can highlight)
     
-  For highlighting previous:
-    //Previous-start: previous piece position, pre-move.
-    //previous-end: previous piece position, post-move.
-
-  For adding circles to the screen to show possible moves.
-  //looks like the css is:
-  //Empty Square (small green circle)
-    background-image: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
-  //Capture (this highlights edges with green)
-    background-image: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.3) 80%)
-  //LeftNav
 
   //Right Sidebar
 
@@ -71,90 +34,105 @@ function App() {
   ];
   currentGame.addPieces(startingPieces);
 
-  let [boardState, setBoardState] = useState(currentGame.board);
-  console.log(boardState);
+  let [gameState, setGameState] = useState(currentGame);
 
   let handleSquareClick = (evt) => {
-    console.log(evt.target.classList[0]); //first class is coords.
     let coordString = evt.target.classList[0]; //meta tag, has board position.
     let [clickedRow, clickedCol] = [+coordString[0], +coordString[1]];
-    console.log('selected row is: ', clickedRow);
-    console.log('selected col is: ', clickedCol);
+    //console.log('selected row is: ', clickedRow, 'selected col is: ', clickedCol);
     
-    let currPiece = boardState[clickedRow, clickedCol]; //current game?
-    let currLegalMoves = currPiece.currLegalMoves.slice();
+    let selectPiece = (currPiece) => {
+      setGameState((prevGameState => {
+        //SHOULD IN THEORY MAKE A COPY. Otherwise this gets messy fast.
+        let gameStateNow = Object.assign(Object.create(Object.getPrototypeOf(prevGameState)),prevGameState);
+        gameStateNow.selected = currPiece;
+        //console.log('Made selection. current gameState is:', gameStateNow);
+        return gameStateNow;
+      }))
+    };
 
-    for (let i = 0; i < currLegalMoves; i++){
-      //I want to just add classList here. But do I need to push this into boardJSX code?
+    let unselectPiece = () => {
+      setGameState((prevGameState => {
+        let gameStateNow = Object.assign(Object.create(Object.getPrototypeOf(prevGameState)),prevGameState);
+        gameStateNow.selected = null;
+        gameStateNow.selectedMoves = [];
 
+        //console.log('Cleared selection. current gameState is:', gameStateNow);
+        return gameStateNow;
+      }));
+    };
+    
+    let movePiece = (destRow, destCol) => {
+      setGameState(prevGameState => {
+        let gameStateNow = Object.assign(Object.create(Object.getPrototypeOf(prevGameState)),prevGameState);
+        gameStateNow.movePiece(destRow, destCol);
+        gameStateNow.selected = null;
+        gameStateNow.selectedMoves = [];
+
+        //console.log('Cleared selection. current gameState is:', gameStateNow);
+        return gameStateNow;
+      });    
+    };
+
+
+    let currPiece = gameState.board[clickedRow][clickedCol];
+
+    if (gameState.selected){
+      let validMove = gameState.selected.isValidMove(clickedRow, clickedCol);
+      if (validMove){
+        movePiece(clickedRow, clickedCol);
+      } else {
+        unselectPiece();
+      }
+    } else {
+      if (currPiece){ //Select if same color
+        selectPiece(currPiece);
+      }
     }
-    //If no piece selected:
-      //select piece if possible
-      //display valid moves.
-    
-    
-    //check if piece is selected:
-      //if so, check if valid move.
-
-  //Has to do a lot:
-  //What happens when you click on a piece?
-    //Square is highlighted
-    //possible moves are highlighted w/ circle. If piece capture highlight border.
-      //If clicking a possible move
-        //and it's a capture
-          //Update board. remove my piece from previous position + insert at new
-            //remove enemy piece from new
-        //and it's not a capture
-          //Update board: remove my piece from previous position + insert at new
-      //If clicking one of your pieces
-        //switch selected to new piece + highlight new moves
-      //If clicking an empty square or an enemy piece
-        //unselect
-      //If clicking same piece again
-        //unselect
   }
 
-  //write JSX as as a function of boardState. 
-  let writeBoardJSX = (board) => {
-
+  //write JSX as as a function of gameState. 
+  let writeBoardJSX = (game) => {
+    let board = game.board;
     let fullboardJSX = [];
-    let rowJSX;
+    //let rowJSX;
     let squaresJSX = [];
     
     for (let i = 0; i < board.length; i++){ //rows
       let currRow = board[i];
-      //squaresJSX = [];
       for (let j = 0; j < currRow.length; j++){ //columns
         let currSquare = board[i][j];
-        let squareColor = (i+j) % 2 ? "black-square" : "white-square"; //if i+j is even, color is white. else black.
-        let squarePiece = currSquare ? currSquare.color + '-' + currSquare.constructor.name : ''; 
-        let squareMeta = '' + i + j; //not used for display, shows coords when inspecting. Used in handleClick.
+        
         //Display dependent on classes: 
-        let squareClasses = squareMeta + " board-square " + squareColor;
-        if (squarePiece){
-          squareClasses += ' ' + squarePiece;
-        }
+        //Each of the below variables CAN add a class to squareJSX. 
+        let squareCoords = '' + i + j; //used in handleClick.
+        let squareColor = (i+j) % 2 ? " black-square" : " white-square"; //if i+j is even, color is white
+        let squarePiece = currSquare ? ' ' + currSquare.color + '-' + currSquare.constructor.name : '';
+        
+        //Sort of dangerous below: && if game.selected is null, && short-circuits
+        //this is NEEDED, since game.selected.row would throw an error.
+        //Could try optional chaining: game.selected?.row (this should return undefined rather than throw error)
+        let isSelected = (game.selected && game.selected.row == [i] && game.selected.col == [j]) ? ' selected' : '';
+        let moveDest = (game.selected && game.selected.isValidMove(i,j)) ? ' move-dest' : ''; 
+        let canCapture = (moveDest && squarePiece) ? ' capt' : '';
+
         
         
+        let squareClasses = squareCoords + " square " + squareColor + squarePiece +
+        isSelected + moveDest + canCapture;
+        
+        //build JSX, push to the array that becomes the displayed board once gridified.
         let squareJSX = <div key={'square-'+i+j} className={squareClasses}
           onClick={handleSquareClick}></div>;
         squaresJSX.push(squareJSX);
       }
-      //rowJSX = <div key={'row-' + i} className="board-row">{squaresJSX}</div>;
-      //fullboardJSX.push(rowJSX);
     }
     fullboardJSX.push(squaresJSX);
 
     return fullboardJSX;
-    /*
-    let testJSX = [];
-    let testrowJSX = [<div>Val1</div>, <div>Val2</div>, <div>Val3</div>];
-    testJSX.push(testrowJSX, testrowJSX, testrowJSX);
-    return testJSX;
-    */
   };
 
-  let boardJSX = writeBoardJSX(boardState);
+  let boardJSX = writeBoardJSX(gameState);
 
   return (
     <div className="App">
@@ -192,6 +170,7 @@ export default App;
 //#22211f   rgba(34,33,31,255)      //almost black for the extra-menu
 //#769656   rgba(118,150,86,255)    //green for board.
 //#eeeed2   rgba(238,238,210,255)   //off-white for board.
+//          rgba(255,255,0,255)     //yellow for selected piece.
 //#dedede   rgba(222,222,222,255)   //almost full white for leftmenu text
 //ffffff    rgba(255,255,255,255)   //full white for rightmenu text
 

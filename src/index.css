@@ -22,6 +22,57 @@ body {
   gap: 40px;
 }
 
+
+/*Navigation Bar CSS*/
+
+.leftnavbar {
+  height: inherit;
+  position: relative;
+  flex-shrink: 0; /*we don't want the base sidebar to shrink with the page*/
+  display: flex;
+  background-color: #272522
+}
+.leftnavbase {
+  height: inherit;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.leftnavbase .navbase {
+  height: var(--naviconheight);
+  width: 150px;
+  display: flex; /*icon image and text container*/
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+}
+.navbase img {
+  height: var(--naviconheight);
+}
+.leftnav-extra {
+  height: inherit;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 150px;
+  display: none;
+  background-color: #22211f;
+}
+
+.leftnav:hover .leftnav-extra{
+  display: block;
+}
+.navplay:hover, .navpuzzles:hover, .navlessons:hover{ background-color: #22211f;}
+/*still need hovers for sign up, log in buttons*/
+
+
+
+
+
+/*Chess board CSS*/
+
 .mainbody > .fullboard {
   height: 560px;
   width: 560px;
@@ -30,20 +81,27 @@ body {
   grid-template-columns: 70px 70px 70px 70px 70px 70px 70px 70px;
 }
 
-.board-square {
+.square {
   height: 70px;
   width: 70px;
   color:rgb(1, 129, 86);
 }
+
 .white-square {
   background-color: rgba(238,238,210,255);
 }
 .black-square {
   background-color: rgba(118,150,86,255);
 }
-.board-square-icon {
-  height:70px;
-  width: 70px;
+
+.selected {
+  background-color: rgba(230,230,0,255);
+}
+.move-dest {
+  background-image: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+}
+.capt {
+  background-image: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.3) 80%);
 }
 
 .white-rook,.black-rook,.white-bishop,.black-bishop,
@@ -51,7 +109,8 @@ body {
 .white-queen,.black-queen,.white-king,.black-king {
   background-size: contain;
 }
-/*background-image: grabs from src/ folder. even though img src= needs to grab from public*/
+/*background-image: grabs from src/ folder. even though img src= needs to grab from public.
+May need to refactor: currently background-image interferes with .capt style.*/
 .white-rook { background-image: url('piece-icons/wr.png');  }
 .black-rook { background-image: url('piece-icons/br.png');  }
 .white-bishop { background-image: url('piece-icons/wb.png');  }
@@ -64,3 +123,4 @@ body {
 .black-queen { background-image: url('piece-icons/bq.png');  }
 .white-king { background-image: url('piece-icons/wk.png');  }
 .black-king { background-image: url('piece-icons/bk.png');  }
+
