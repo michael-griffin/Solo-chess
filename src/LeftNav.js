@@ -10,25 +10,42 @@ function LeftNav(){
         //Seems closer to a job for state + re-rendering Nav.
         //Simpler if we could do full list
         //and make a subset visible on hover
+
+    //Play (maybe skip extra menu, just default to solo chess).
+        //Solo chess
+            //Atomic Chess?
+            //Horde?
+
+    //Puzzles
+        //Puzzle Streak (no time-limit, one skip per puzzle? Session? Hint?)
+        //Puzzle Storm
+        //Custom Puzzles (revisit past, select by type).
+
+    //Learn
+        //Openings
+        //Endgames
+        //Drills
+        //Lessons
+
     return (
         <nav className="leftnav">
             <div className="leftnav-base">
-                <div className="navbase navhome"> 
+                <div className="navbase navhome">
                     <a className="nav-link" href="#">
                         <img src="icons/sitelogo.png" />
                     </a>
                 </div>
                 <div className="navbase navplay">
                     <img src="icons/playwhite.svg" />
-                    <span>Play</span>
+                    <span className="leftnav-text">Play</span>
                 </div>
                 <div className="navbase navpuzzles">
                     <img src="icons/puzzles.svg" />
-                    <span>Puzzles</span>
+                    <span className="leftnav-text">Puzzles</span>
                 </div>
                 <div className="navbase navlessons">
                     <img src="icons/lessons.svg" />
-                    <span>Lessons</span>
+                    <span className="leftnav-text">Learn</span>
                 </div>
                 <div className="navbase navsignup">Sign Up</div>
                 <div className="navbase navlogin">Log In</div>

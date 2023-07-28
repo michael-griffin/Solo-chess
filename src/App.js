@@ -1,7 +1,8 @@
 import React from "react"
 import {useState} from "react"
 import LeftNav from "./LeftNav"
-import {chessGame, chessPiece, rook} from "./gamepieces.js" 
+import BoardSidebar from "./BoardSidebar"
+import {chessGame, chessPiece, rook} from "./gamepieces.js"
 
 //import rookImage from "./wr.png" This works, but is a bit convoluted to do for every icon.
 //Images are currently living in public/icons/ (the folder is identical to here, but doesn't require
@@ -18,19 +19,21 @@ function App() {
   //Board
   //Pieces are moving, selection's working ok. Need to test other pieces.
 
-    
+
 
   //Right Sidebar
 
   */
+  let [gameMode, setGameMode] = useState('solo-chess'); //or puzzle, or...
+
 
   //May need something like useRef to manage currentGame (we want it to persist between renders).
   let currentGame = new chessGame;
   let startingPieces = [
-    {type: 'rook', color: 'white', row: 0, col: 0}, 
-    {type: 'rook', color: 'white', row: 7, col: 7}, 
-    {type: 'rook', color: 'black', row: 7, col: 4}, 
-    {type: 'rook', color: 'black', row: 5, col: 0} 
+    {type: 'rook', color: 'white', row: 0, col: 0},
+    {type: 'rook', color: 'white', row: 7, col: 7},
+    {type: 'rook', color: 'black', row: 7, col: 4},
+    {type: 'rook', color: 'black', row: 5, col: 0}
   ];
   currentGame.addPieces(startingPieces);
 
@@ -40,7 +43,7 @@ function App() {
     let coordString = evt.target.classList[0]; //meta tag, has board position.
     let [clickedRow, clickedCol] = [+coordString[0], +coordString[1]];
     //console.log('selected row is: ', clickedRow, 'selected col is: ', clickedCol);
-    
+
     let selectPiece = (currPiece) => {
       setGameState((prevGameState => {
         //SHOULD IN THEORY MAKE A COPY. Otherwise this gets messy fast.
@@ -61,7 +64,7 @@ function App() {
         return gameStateNow;
       }));
     };
-    
+
     let movePiece = (destRow, destCol) => {
       setGameState(prevGameState => {
         let gameStateNow = Object.assign(Object.create(Object.getPrototypeOf(prevGameState)),prevGameState);
@@ -71,7 +74,7 @@ function App() {
 
         //console.log('Cleared selection. current gameState is:', gameStateNow);
         return gameStateNow;
-      });    
+      });
     };
 
 
@@ -91,36 +94,36 @@ function App() {
     }
   }
 
-  //write JSX as as a function of gameState. 
+  //write JSX as as a function of gameState.
   let writeBoardJSX = (game) => {
     let board = game.board;
     let fullboardJSX = [];
     //let rowJSX;
     let squaresJSX = [];
-    
+
     for (let i = 0; i < board.length; i++){ //rows
       let currRow = board[i];
       for (let j = 0; j < currRow.length; j++){ //columns
         let currSquare = board[i][j];
-        
-        //Display dependent on classes: 
-        //Each of the below variables CAN add a class to squareJSX. 
+
+        //Display dependent on classes:
+        //Each of the below variables CAN add a class to squareJSX.
         let squareCoords = '' + i + j; //used in handleClick.
         let squareColor = (i+j) % 2 ? " black-square" : " white-square"; //if i+j is even, color is white
         let squarePiece = currSquare ? ' ' + currSquare.color + '-' + currSquare.constructor.name : '';
-        
+
         //Sort of dangerous below: && if game.selected is null, && short-circuits
         //this is NEEDED, since game.selected.row would throw an error.
         //Could try optional chaining: game.selected?.row (this should return undefined rather than throw error)
         let isSelected = (game.selected && game.selected.row == [i] && game.selected.col == [j]) ? ' selected' : '';
-        let moveDest = (game.selected && game.selected.isValidMove(i,j)) ? ' move-dest' : ''; 
+        let moveDest = (game.selected && game.selected.isValidMove(i,j)) ? ' move-dest' : '';
         let canCapture = (moveDest && squarePiece) ? ' capt' : '';
 
-        
-        
+
+
         let squareClasses = squareCoords + " square " + squareColor + squarePiece +
         isSelected + moveDest + canCapture;
-        
+
         //build JSX, push to the array that becomes the displayed board once gridified.
         let squareJSX = <div key={'square-'+i+j} className={squareClasses}
           onClick={handleSquareClick}></div>;
@@ -137,19 +140,25 @@ function App() {
   return (
     <div className="App">
       <LeftNav />
-      <main className="mainbody">
-        <div className="mainhead">(Icon) Opponent + Time</div>
-        <div className="fullboard">
-          {boardJSX}
+      <main>
+        <div className="board-container">
+          <div className="fullboard">
+            {boardJSX}
+          </div>
         </div>
-        <div className="mainfoot">(Icon) You + Time</div>
+      <BoardSidebar />
       </main>
+    </div>
+  );
+}
+
+/*
       <aside className="sidebar">
         <div className="righthead">
           <div className="rightheadmsg">Play Chess</div>
           <div className="rightheadicon">hand takes pawn</div>
         </div>
-        
+
         <div className="rightbody">Just Imagine, like, a lot of stuff here.
           <div className="playonline">Play Online</div>
           <div className="playcomputer">Computer</div>
@@ -157,13 +166,10 @@ function App() {
           <div className="playvariants">Play Variants</div>
         </div>
       </aside>
-    </div>
-  );
-}
-
+*/
 export default App;
 
-//hex colors for site: 
+//hex colors for site:
 //https://imagecolorpicker.com/en
 //#312e2b   rgba(49,46,43,255)      base background color (in between menus/board)
 //#272522   rgba(39,37,34,255)      //darker grey: left/right nav menus
@@ -192,7 +198,7 @@ export default App;
 /*
 //old helper function in board JSX function.
 //useful when we were adding images as content. Now no longer needed.
-    
+
     let getPiece = (pieceName, pieceColor) => {
       let squarePiece;
       if (pieceName == "rook") {

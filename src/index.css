@@ -9,60 +9,82 @@
   font-family: "Segoe UI", system-ui, Helvetica, Arial, sans-serif; /*good practice to quote names with whitespace*/
   background-color: #312e2b;
   color: #dedede;
-  --naviconheight: 44px;
+  --navicon-height: 44px;
+  height: 100%;
+
+  --light-grey: #33322f;
+  --grey: #312e2b;
+  --dark-grey: #272522;
+  --darker-grey: #22201d;
+  --left-nav-width: 160px;
+  --select-dropdown: #3d3b39;
+  --select-text: #bebdbc;
+  --checkbox-green: #81b64c;
+  --checkbox-grey: #bebdb9;
+  --checkbox-size: 20px;
+  --font-size: 15px;
 }
-body {
+
+#root, html, body {
   min-height: 100%;
   height: 100vh; /*take up 100% of the viewport. dvh is a newer alternative that could support mobile better*/
   margin: 0;
+  font-size: var(--font-size);
 }
 
 .App {
+  height: 100%;
   display: flex;
   gap: 40px;
 }
 
+button {
+  all: unset;
+  cursor: pointer;
+}
 
 /*Navigation Bar CSS*/
 
-.leftnavbar {
-  height: inherit;
+.leftnav {
+  min-height: 100%;
+  width: var(--left-nav-width);
   position: relative;
   flex-shrink: 0; /*we don't want the base sidebar to shrink with the page*/
   display: flex;
-  background-color: #272522
+  background-color: #272522;
 }
-.leftnavbase {
-  height: inherit;
-  width: 150px;
+.leftnav-base {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-.leftnavbase .navbase {
-  height: var(--naviconheight);
-  width: 150px;
+.leftnav-base .navbase {
+  box-sizing: border-box;
+  height: var(--navicon-height);
+  width: var(--left-nav-width);
   display: flex; /*icon image and text container*/
   align-items: center;
   gap: 10px;
-  margin-left: 10px;
+  padding-left: 10px;
 }
 .navbase img {
-  height: var(--naviconheight);
+  height: var(--navicon-height);
 }
 .leftnav-extra {
-  height: inherit;
+  height: 400px;
   width: 200px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   position: absolute;
-  left: 150px;
-  display: none;
+  left: var(--left-nav-width);
+  visibility: hidden;
   background-color: #22211f;
 }
 
 .leftnav:hover .leftnav-extra{
-  display: block;
+  visibility: visible;
 }
 .navplay:hover, .navpuzzles:hover, .navlessons:hover{ background-color: #22211f;}
 /*still need hovers for sign up, log in buttons*/
@@ -70,10 +92,19 @@ body {
 
 
 
+main {
+  padding: 16px;
+  display: flex;
+  justify-content: start;
+  gap: 60px;
+}
 
 /*Chess board CSS*/
 
-.mainbody > .fullboard {
+.board-container {
+  margin-top: 20px;
+}
+.board-container > .fullboard {
   height: 560px;
   width: 560px;
   display: grid;
@@ -124,3 +155,121 @@ May need to refactor: currently background-image interferes with .capt style.*/
 .white-king { background-image: url('piece-icons/wk.png');  }
 .black-king { background-image: url('piece-icons/bk.png');  }
 
+
+
+
+
+/*boardSidebar CSS*/
+
+.board-sidebar {
+  min-width: 400px;
+  height: 100%;
+  background-color: var(--dark-grey);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px;
+}
+
+.sidebar-head-text {
+  text-align: center;
+}
+
+.sidebar-body{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sidebar-select {
+  box-sizing: border-box;
+  padding-left: 10px;
+  height: 40px;
+  width: 75%;
+  margin-bottom: 30px;
+  background-color: var(--select-dropdown);
+  color: var(--select-text);
+  border: 0px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+
+/*Checkbox formatting*/
+
+.checkbox-grid-label {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.checkbox-grid {
+  display: grid;
+  grid-template-rows:repeat(3, var(--checkbox-size));
+  grid-template-columns: repeat(5,var(--checkbox-size));
+  grid-gap: 7px 7px;
+}
+.checkbox-header, .checkbox-container, .checkbox-icon {
+  height: var(--checkbox-size);
+  width: var(--checkbox-size);
+  border-radius: 5px;
+}
+.checkbox-header {
+  text-align: center;
+}
+.checkbox-container {
+  background-color: var(--checkbox-grey);
+}
+/*
+.checkbox-icon {
+
+}
+*/
+
+
+/*Sidebar footer buttons*/
+
+
+.sidebar-footer {
+  height: 20%;
+  width: 100%;
+  background-color: var(--darker-grey);
+  border-radius: 16px; /*same as sidebar, since this covers overall sidebar radius*/
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.footer-large-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.footer-large-button {
+  box-sizing: border-box;
+  height: 50px;
+  width: 130px;
+  text-align: center;
+  background-color: var(--light-grey);
+  border-radius: 5px;
+}
+
+.footer-small-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.footer-small-button {
+  box-sizing: border-box;
+  height: 40px;
+  width: 90px;
+  padding: 10px 10px;
+  text-align: center;
+  background-color: var(--light-grey);
+  border-radius: 5px;
+}
