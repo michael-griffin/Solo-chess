@@ -12,9 +12,6 @@
   --navicon-height: 44px;
   height: 100%;
 
-  --solochess-levels: 10;
-  --solochess-per-level: 4; /*1 more than actual count*/
-
   --light-grey: #33322f;
   --grey: #312e2b;
   --dark-grey: #272522;
@@ -230,13 +227,10 @@ May need to refactor: currently background-image interferes with .capt style.*/
   font-weight: bold;
   font-size: 1.1rem;
 }
-.checkbox-grid {
-  display: grid;
-  grid-template-rows:repeat(var(--solochess-per-level), var(--checkbox-size));
-  grid-template-columns: repeat(var(--solochess-levels),var(--checkbox-size));
-  grid-gap: 7px 7px;
-}
-.checkbox-header, .checkbox-container, .checkbox-icon {
+
+.checkbox-header, .checkbox-square, .checkbox-icon {
+  min-height: var(--checkbox-size);
+  min-width: var(--checkbox-size);
   height: var(--checkbox-size);
   width: var(--checkbox-size);
   border-radius: 5px;
@@ -244,8 +238,19 @@ May need to refactor: currently background-image interferes with .capt style.*/
 .checkbox-header {
   text-align: center;
 }
-.checkbox-container {
+.checkbox-square {
   background-color: var(--checkbox-grey);
+}
+
+.checkbox-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.checkbox-row {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
 }
 /*
 .checkbox-icon {

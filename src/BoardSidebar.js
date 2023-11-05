@@ -78,58 +78,35 @@ function BoardSidebar() {
   let writeCheckBoxesJSX = (perLevel, numLevels) => {
     let checkboxGrid = [];
 
-    // for (let j = 1; j <= numLevels; j++){
-    //   let checkboxHeader = <div className="checkbox-header">{j}</div>;
-    //   checkboxGrid.push(checkboxHeader)
-    // }
+    let rowSquares = [];
+    for (let j = 1; j <= numLevels; j++){
+      let checkboxHeader = <div className="checkbox-header">{j}</div>;
+      rowSquares.push(checkboxHeader)
+    }
+    let checkBoxRow = <div className="checkbox-row">
+      {rowSquares}
+    </div>;
+    checkboxGrid.push(checkBoxRow);
 
-    // let count = 0;
-    // for (let i = 0; i <= perLevel; i++){
-    //   for (let j = 1; j <= numLevels; j++){
-    //     let checkboxSquare;
-
-    //     if (i == 0) {
-    //       //write Level Labels;
-    //       checkboxSquare = <div className="checkbox-header">{j}</div>;
-    //     } else if (i % 2 == 1) {
-    //       //write empty box
-    //       checkboxSquare = <div className="checkbox-container"></div>;
-    //     } else {
-    //       //write checkbox
-    //       checkboxSquare = <div className="checkbox-container">
-    //         <CheckBox />
-    //       </div>;
-    //     }
-
-    //     //checkboxSquare = <div className="checkbox-header">{j}</div>
-    //     checkboxGrid.push(checkboxSquare);
-    //     count++;
-    //   }
-    // }
 
     let count = 0;
-    for (let i = 0; i <= perLevel; i++){
+    for (let i = 0; i < perLevel; i++){
+      let rowSquares = [];
       for (let j = 1; j <= numLevels; j++){
         let checkboxSquare;
-
-        if (i == 0) {
-          //write Level Labels;
-          checkboxSquare = <div className="checkbox-header">{j}</div>;
-        } else if (i % 2 == 1) {
-          //write empty box
-          checkboxSquare = <div className="checkbox-container"></div>;
+        if (levels[i].completed) {
+          checkboxSquare = <div className="checkbox-square"><CheckBox /></div>;
         } else {
-          //write checkbox
-          checkboxSquare = <div className="checkbox-container">
-            <CheckBox />
-          </div>;
+          checkboxSquare = <div className="checkbox-square"></div>;
         }
-
-        //checkboxSquare = <div className="checkbox-header">{j}</div>
-        checkboxGrid.push(checkboxSquare);
+        rowSquares.push(checkboxSquare);
         count++;
       }
+
+      let checkBoxRow = <div className="checkbox-row">{rowSquares}</div>;
+      checkboxGrid.push(checkBoxRow);
     }
+
     return checkboxGrid;
   };
 
@@ -163,16 +140,9 @@ function BoardSidebar() {
         <select name="level" className="sidebar-select">
           <option value="challenge">Challenge Mode</option>
           {difficulties.map(diffNum => {
-            return <option value={`diff-${diffNum}`}>Difficulty {diffNum}</option>
+            return <option value={`diff-${diffNum}`}>Level {diffNum}</option>
           })}
           <option value="random">Random Mode</option>
-          {/* <option value="challenge">Challenge Mode</option>
-          <option value="level-1">Level 1</option>
-          <option value="level-2">Level 2</option>
-          <option value="level-3">Level 3</option>
-          <option value="level-4">Level 4</option>
-          <option value="level-5">Level 5</option>
-          <option value="random">Random Mode</option> */}
         </select>
 
         <p className="checkbox-grid-label">Level</p>
