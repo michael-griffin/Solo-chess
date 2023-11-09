@@ -26,7 +26,7 @@ function BoardSidebar() {
   async function GetData(filepath) {
       const data = await fetchCsv(filepath);
       const parsed = Papa.parse(data); //Object with keys of: data/errors/meta
-      console.log(parsed.data);
+      // console.log(parsed.data);
       return parsed.data;
   }
 
@@ -59,7 +59,7 @@ function BoardSidebar() {
         return level;
       });
 
-      console.log(formattedLevels);
+      // console.log(formattedLevels);
       setLevels(formattedLevels);
     }
     setInitialSoloChessLevels();

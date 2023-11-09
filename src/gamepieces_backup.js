@@ -1,4 +1,8 @@
-/*
+//Probably makes sense to split
+
+
+/*Setting up a chess program
+
 
 chessGame:   contains board + functions to change it
     initialized as empty board.
@@ -91,32 +95,40 @@ class chessGame {
         this.getAllLegalMoves();
     }
 
-    //TODO: have onClick events trigger selectPiece;
-    /** Selects a piece. Triggered on click. */
-    selectPiece(row, col){
-        this.selected = this.board[row][col];
-    }
-
-    /** Checks if there is a selected piece.
-     * If so, checks whether selected piece has a valid move at destRow, destCol
-     * Then, makes a new piece, updates its position.
-     * Updates prevMove fields (prevStart/prevDest) with old/new piece respectively
-     * Finally, updates board: clears old piece(s) and adds new Piece.
-     */
     movePiece(destRow, destCol){
+        //movePiece(startPos, destPos){
+        //Checks:
+            // if piece exists at startPos
+            // if piece has a legal move at destPos
+        //If checks pass, make a new piece and update its position fields.
+        //Then, update board
+            //delete old piece, add new piece
+            //update piecesLists, recalculate legal moves for each piece on board.
+
         let selectedPiece = this.selected;
-        if (!selectedPiece){
+        if (!selectedPiece){ // do we have a piece to move to destPos?
             console.log('no piece present');
             return selectedPiece; //undefined.
         }
+        let [startRow, startCol] = [selectedPiece.row, selectedPiece.col];
+        //let [destRow, destCol] = destPos;
+
 
         let validMove = selectedPiece.isValidMove(destRow, destCol);
+        /*
+        let validMove = false; //check if selectedPiece's legalMoves array contains destPos;
+        for (let i = 0; i < this.selectedMoves.length; i++){
+            let [currRow, currCol] = this.selectedMoves[i];
+            if (currRow == destRow && currCol == destCol){
+                validMove = true;
+                break;
+            }
+        }
+        */
         if (!validMove){
             console.log('not a valid move! returning currPiece legalMoves');
             return selectedPiece.legalMoves;
         }
-
-        let [startRow, startCol] = [selectedPiece.row, selectedPiece.col];
 
         //Cloning a class Object is messy. Object.assign gets everything except methods of original,
         //So we get those by making the 'target' of the assign a new object
@@ -161,9 +173,7 @@ class chessGame {
     }
 
     getAllLegalMoves(){
-        console.log('board is: ', this)
         this.pieces.forEach(piece => {
-            console.log('piece is:', piece);
             piece.getLegalMoves(this.board);
         });
     }
@@ -179,7 +189,6 @@ class chessPiece {
         this.legalMoves = [];
     }
     updatePos(destRow, destCol){
-        console.log('updating piece position, new row-col:', destRow, destCol);
         this.row = destRow;
         this.col = destCol;
         this.moved = this.moved + 1;
@@ -200,13 +209,17 @@ class chessPiece {
 class rook extends chessPiece {
     //Need constructor super call here?
 
-    /** Store an array of legal moves. Used when board tries to move piece:
-     * Check's selected legalMoves, and if invalid, breaks early.
-    */
-    getLegalMoves(board){ //gotten from game class
-
+    //Could try to refactor the below. Rather than several for loops, could have:
+    //Possible moves: [up-array, down-array, left-array, right-array]
+        //Then loop through each subarray.
+    getLegalMoves(board){ //will pretty much always be fullboard.board.
+        //Store an array of legal moves. Then, when the piece is selected, can check
+        //against array, and if includes, execute move.
         let legalMoves = []; //first add according to move rules, then check against
         let possMoves = [];
+        //board state.
+
+        //Check Column, from 0 up to current row;
 
         let nums = [...Array(BOARD_SIZE).keys()];
 
@@ -244,6 +257,54 @@ class rook extends chessPiece {
             }
         }
 
+
+/*      for (let n = this.row-1; n >= 0; n--){
+            let destpiece = board[n][this.col];
+            if (!destpiece){
+                legalMoves.push([n, this.col]); //if empty, it's legal
+            } else if (destpiece.color !== this.color){
+                legalMoves.push([n, this.col]);
+                break; //can capture, but can't continue past enemy piece
+            } else {
+                break; //can't capture own color, and can't continue past piece.
+            }
+        }
+        //Check column, from current row to row 7.
+        for (let n = this.row+1; n <= 7; n++){
+            let destpiece = board[n][this.col];
+            if (!destpiece){
+                legalMoves.push([n, this.col]); //if empty, it's legal
+            } else if (destpiece.color !== this.color){
+                legalMoves.push([n, this.col]);
+                break; //can capture, but can't continue past enemy piece
+            } else {
+                break; //can't capture own color, and can't continue past piece.
+            }
+        }
+        //Check row, from 0 up to current column.
+        for (let n=this.col-1; n >= 0; n--){
+            let destpiece = board[this.row][n];
+            if (!destpiece){
+                legalMoves.push([this.row, n]); //if empty, it's legal
+            } else if (destpiece.color !== this.color){
+                legalMoves.push([this.row, n]);
+                break; //can capture, but can't continue past enemy piece
+            } else {
+                break; //can't capture own color, and can't continue past piece.
+            }
+        }
+        //Check row, from current column to column 7
+        for (let n=this.col+1; n <= 7; n++){
+            let destpiece = board[this.row][n];
+            if (!destpiece){
+                legalMoves.push([this.row, n]); //if empty, it's legal
+            } else if (destpiece.color !== this.color){
+                legalMoves.push([this.row, n]);
+                break; //can capture, but can't continue past enemy piece
+            } else {
+                break; //can't capture own color, and can't continue past piece.
+            }
+        } */
         this.legalMoves = legalMoves;
     }
 }
@@ -251,8 +312,6 @@ class rook extends chessPiece {
 class bishop extends chessPiece {
 
     getLegalMoves(board){
-        console.log('got to bishop getLegalMoves');
-        console.log('row and col', this.row, this.col)
         let legalMoves = [];
         let possMoves = []; //first add according to move rules, then check against
         //Given a position, check:
@@ -260,9 +319,11 @@ class bishop extends chessPiece {
             //to.
 
         //Upper Left
-        let shift = 1;
+
+        //let start;
+        //start = Math.min(this.row, this.col); //for (let shift = 1; (start-shift) >= 0; shift++){
         for (let shift = 1; (this.row - shift >= 0 && this.col - shift >= 0); shift++){
-            let destpiece = board[this.row-shift][this.col-shift];
+            let destpiece = board[this.row-shift,this.col-shift];
             if (!destpiece) {
                 legalMoves.push([this.row-shift, this.col-shift]);
             } else if (destpiece.color !== this.color){
@@ -271,9 +332,9 @@ class bishop extends chessPiece {
             } else {
                 break; //can't capture own color, and can't continue past piece.
             }
-
         }
         //Lower Right
+        //start = Math.max(this.row, this.col);  for (let shift = 1; (start+shift) >= 7; shift++)
         for (let shift = 1; (this.row + shift <= 7 && this.col + shift <= 7); shift++){
             let destpiece = board[this.row+shift][this.col+shift];
             if (!destpiece) {
@@ -298,7 +359,7 @@ class bishop extends chessPiece {
             }
         }
         //Lower Left
-        for (let shift = 1; (this.row + shift <= 7 && this.col - shift >= 0); shift++){
+        for (let shift = 1; (this.row + shift >= 7 && this.col - shift <= 0); shift++){
             let destpiece = board[this.row+shift][this.col-shift];
             if (!destpiece) {
                 legalMoves.push([this.row+shift, this.col-shift]);
@@ -436,9 +497,47 @@ class king extends chessPiece {
     }
 }
 
+
+
+/*
+class boardSquare {
+    piecetype;
+    piececolor;
+    row;
+    column;
+    constructor(squarecolor){
+        this.squarecolor = squarecolor;
+        this.haspiece = 0;
+        this.selected = 0; //1 when selecting a piece of your color. May need to split between move start/position chosen.
+
+    }
+    selectsquare (){
+        //call if clicked here.
+
+    }
+}
+*/
+
+let startingpieces = [
+    {type: 'rook', color: 'white', row: 0, col: 0},
+//    {type: 'rook', color: 'white', row: 7, col: 7},
+//    {type: 'rook', color: 'black', row: 7, col: 4},
+    {type: 'rook', color: 'black', row: 5, col: 0}
+];
+
+let cgame = new chessGame();
+//cgame.setupboard();
+cgame.addPieces(startingpieces);
+//console.log(cgame.board);
+//cgame.board[0][0].getLegalMoves(cgame.board);
+//console.log(cgame.board[0][0]);
+
+cgame.movePiece([0,0], [0,1]);
+//console.log(cgame.board);
+
+
 export {
     chessGame,
     chessPiece,
-    rook,
-    bishop
+    rook
 }

@@ -3,98 +3,47 @@ import {useState} from "react"
 import LeftNav from "./LeftNav"
 import BoardSidebar from "./BoardSidebar"
 import {chessGame, chessPiece, rook} from "./gamepieces.js"
+import parseShorthand from "./utils/parseShorthand.js"
 
-//import rookImage from "./wr.png" This works, but is a bit convoluted to do for every icon.
-//Images are currently living in public/icons/ (the folder is identical to here, but doesn't require
-//an import step.)
+//Odd error: breaks when bishop is added to final row.
+const DEMO_START_BISHOP = "B5r1/8/8/8/8/8/8/8";
+const DEMO_MIDDLE_KNIGHT = "8/8/8/3N4/5r2/8/8/8";
+const STANDARD_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
+//TODO: current issue: bishop's internal position keeps getting reset to 0,0
+//First move correctly updates position. Clicking piece to begin 2nd move
+//Is where reset occurs.
+//TODO: build node testing area first. Hard to know if it's a class or react issue
+//Concerned it's got something to do with updates to board state not keeping
+//in sync with the methods.
+/*
+//Still to do:
+
+//Improvements:
+  //Could update gamepieces.js to standardize possible moves.
+  //currently images are living in two spots. LeftNav uses public/icons, piece imgs are from src/piece-icons.
+
+//Board
+//Pieces are moving, selection's working ok. Need to test other pieces.
+
+
+
+//Right Sidebar
+
+*/
+
+/**
+ * App desc
+ * state
+ * component -> component
+ */
 function App() {
-  /*
-  //Still to do:
-  //Test parseShorthand on an actual board.
-    //Tie parseShorthand to chessGame class?
-  //Get a list of levels to play through from Chess.com
-    //Store them somewhere for easy loading/better organization?
 
-  //Revert image src="" method for displaying which piece is present.
-    //As is, 'capture' background-image and piece background-image cover each other.
-  //Improvements:
-    //Could update gamepieces.js to standardize possible moves.
-    //currently images are living in two spots. LeftNav uses public/icons, piece imgs are from src/piece-icons.
-
-  //Board
-  //Pieces are moving, selection's working ok. Need to test other pieces.
-
-
-
-  //Right Sidebar
-
-  */
   let [gameMode, setGameMode] = useState('solo-chess'); //or puzzle, or...
 
-
-  //May need something like useRef to manage currentGame (we want it to persist between renders).
   let currentGame = new chessGame;
-
-  function parseShorthand(shorthandStr) {
-    //Chess has a shorthand for a boardState, want to convert this into the
-    //format used in addPieces:
-    //[
-    //{type: 'rook', color: 'white', row: 0, col: 0},
-    //{type: 'rook', color: 'white', row: 7, col: 7},
-    //]
-    //Example of shorthand: //r1b2bkr/ppp3pp/2n5/3qp3/2B5/8/PPPP1PPP/RNB1K2R
-    let letterKey = {
-      'p' : 'pawn',
-      'b' : 'bishop',
-      'n' : 'knight',
-      'r' : 'rook',
-      'k' : 'king',
-      'q' : 'queen',
-    };
-    let isNum = char => {
-      let numCheck = /\d/;
-      return (numCheck.test(char)) ? true : false;
-    }
-
-    let shorthand = shorthandStr.split('/');
-
-    if (shorthand.length !== 8) console.log('error, invalid string');
-
-    let startingPieces = [];
-    for (let i = 0; i < shorthand.length; i++){ //rows,
-      let currRow = shorthand[i];
-      let currCol = 0; //column
-      for (let j = 0; j < currRow.length; j++){ //
-        let char = currRow[j];
-        if (isNum(char)) {
-          //no piece to place, increment currCol by num.
-          currCol += Number(char);
-        } else {
-          let isUpper = char.toUpperCase() === char;
-          let color = isUpper ? 'white' : 'black';
-          let pieceType = letterKey[char.toLowerCase()];
-          let newPiece = {
-            'type': pieceType,
-            'color' : color,
-            'row' : i,
-            'col' : currCol
-          };
-          startingPieces.push(newPiece);
-          currCol++;
-        }
-
-      }
-    }
-
-    return startingPieces;
-  }
-
-  let startingPieces = [
-    {type: 'rook', color: 'white', row: 0, col: 0},
-    {type: 'rook', color: 'white', row: 7, col: 7},
-    {type: 'rook', color: 'black', row: 7, col: 4},
-    {type: 'rook', color: 'black', row: 5, col: 0}
-  ];
+  const startingPieces = parseShorthand(DEMO_START_BISHOP);
+  console.log(startingPieces);
   currentGame.addPieces(startingPieces);
 
   let [gameState, setGameState] = useState(currentGame);
@@ -212,21 +161,6 @@ function App() {
   );
 }
 
-/*
-      <aside className="sidebar">
-        <div className="righthead">
-          <div className="rightheadmsg">Play Chess</div>
-          <div className="rightheadicon">hand takes pawn</div>
-        </div>
-
-        <div className="rightbody">Just Imagine, like, a lot of stuff here.
-          <div className="playonline">Play Online</div>
-          <div className="playcomputer">Computer</div>
-          <div className="playafriend">Play a Friend</div>
-          <div className="playvariants">Play Variants</div>
-        </div>
-      </aside>
-*/
 export default App;
 
 //hex colors for site:
@@ -288,3 +222,9 @@ export default App;
   <text x="97.5" y="99" font-size="2.8" class="coordinate-light">h</text>
 </svg>
 */
+// let startingPieces = [
+//   {type: 'rook', color: 'white', row: 0, col: 0},
+//   {type: 'rook', color: 'white', row: 7, col: 7},
+//   {type: 'rook', color: 'black', row: 7, col: 4},
+//   {type: 'rook', color: 'black', row: 5, col: 0}
+// ];
