@@ -1,4 +1,5 @@
 /*
+//FIXME: currently knights/kings can take their own color by default.
 
 chessGame:   contains board + functions to change it
     initialized as empty board.
@@ -145,7 +146,7 @@ class ChessGame {
             for (let piece of currRow){
                 if (piece){
                     this.pieces.push(piece);
-                    if (piece.color == 'white'){
+                    if (piece.color === 'white'){
                         this.piecesWhite.push(piece);
                     } else {
                         this.piecesBlack.push(piece);
@@ -183,7 +184,7 @@ class ChessPiece {
         let validMove = false; //check if Piece's legalMoves array contains destPos;
         for (let i = 0; i < this.legalMoves.length; i++){
             let [currRow, currCol] = this.legalMoves[i];
-            if (currRow == destRow && currCol == destCol){
+            if (currRow === destRow && currCol === destCol){
                 validMove = true;
                 break;
             }
@@ -247,13 +248,12 @@ class Bishop extends ChessPiece {
 
     getLegalMoves(board){
         let legalMoves = [];
-        let possMoves = []; //first add according to move rules, then check against
+        //let possMoves = []; //first add according to move rules, then check against?
         //Given a position, check:
             //For loop along both rows and cols, to see which edge we risk going out of bounds on
             //to.
 
         //Upper Left
-        let shift = 1;
         for (let shift = 1; (this.row - shift >= 0 && this.col - shift >= 0); shift++){
             let destpiece = board[this.row-shift][this.col-shift];
             if (!destpiece) {
@@ -322,7 +322,7 @@ class Knight extends ChessPiece {
             let keep = true;
             if (pair[0] >= 0 && pair[0] <= 7 && pair[1] >= 0 && pair[1] <= 7){ //if in bounds of board.
                 let destpiece = board[pair[0]][pair[1]];
-                if (destpiece && destpiece.color == this.color) keep = false;
+                if (destpiece && destpiece.color === this.color) keep = false;
             } else {
                 keep = false;
             }
@@ -338,14 +338,14 @@ class Pawn extends ChessPiece {
     getLegalMoves(board){
         let legalMoves = [];
         let frontpiece; let leftpiece; let rightpiece; let front2piece;
-        if (this.color == 'white'){ //start at bottom and moving UP (-row)
+        if (this.color === 'white'){ //start at bottom and moving UP (-row)
             //just check by hand:
             if (this.row > 0 ) { //If 1 in front.
                 //Move up 1.
                 frontpiece = board[this.row-1][this.col];
                 if (!frontpiece) legalMoves.push([this.row-1, this.col]);
                 //Move up 2.
-                if (this.row > 1 && this.moved == 0){ //if two in front.
+                if (this.row > 1 && this.moved === 0){ //if two in front.
                     front2piece = board[this.row-2][this.col];
                     if (!front2piece) legalMoves.push([this.row-2, this.col]);
                 }
@@ -370,7 +370,7 @@ class Pawn extends ChessPiece {
                 frontpiece = board[this.row+1][this.col];
                 if (!frontpiece) legalMoves.push([this.row+1, this.col]);
                 //Move up 2.
-                if (this.row < 6 && this.moved == 0){ //if two in front.
+                if (this.row < 6 && this.moved === 0){ //if two in front.
                     front2piece = board[this.row+2][this.col];
                     if (!front2piece) legalMoves.push([this.row+2, this.col]);
                 }
@@ -435,7 +435,7 @@ class King extends ChessPiece {
             let keepMove = true;
             if (row >= 0 && row <= 7 && col >= 0 && col <= 7){
                 let destpiece = board[row][col];
-                if (destpiece && destpiece.color == this.color) keepMove = false;
+                if (destpiece && destpiece.color === this.color) keepMove = false;
             } else {
                 keepMove = false;
             }

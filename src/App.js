@@ -11,12 +11,17 @@ const DEMO_MIDDLE_KNIGHT = "8/8/8/3K4/5r2/8/8/8";
 const DEMO_MIDDLE_QUEEN = "6r1/8/8/3Q4/5r2/8/8/8";
 const STANDARD_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
-//TODO: current issue: bishop's internal position keeps getting reset to 0,0
-//First move correctly updates position. Clicking piece to begin 2nd move
-//Is where reset occurs.
-//TODO: build node testing area first. Hard to know if it's a class or react issue
-//Concerned it's got something to do with updates to board state not keeping
-//in sync with the methods.
+//FIXME: current issue: when moving pieces, position logged is inconsistent.
+//Using DEMO_START_BISHOP, moving bishop to the middle will appear
+//to log the correct position (and the screen will update correctly).
+//However, on reselecting piece, it's initial position is logged. This will
+//'correct' itself on the next move.
+
+//This doesn't seem to be an issue in the node demo, which makes me worried
+// I'm not updating state correctly here. I'm using a somewhat unusual pattern
+// that came from stack overflow -- if there's a better alternative I'd love to know.
+
+
 /*
 //Still to do:
 
@@ -42,7 +47,7 @@ function App() {
 
   let [gameMode, setGameMode] = useState('solo-chess'); //or puzzle, or...
 
-  let startOfGame = new ChessGame;
+  let startOfGame = new ChessGame();
   const startingPieces = parseShorthand(DEMO_START_BISHOP);
   console.log(startingPieces);
   startOfGame.addPieces(startingPieces);
@@ -124,7 +129,7 @@ function App() {
         //Sort of dangerous below: && if game.selected is null, && short-circuits
         //this is NEEDED, since game.selected.row would throw an error.
         //Could try optional chaining: game.selected?.row (this should return undefined rather than throw error)
-        let isSelected = (game.selected && game.selected.row == [i] && game.selected.col == [j]) ? ' selected' : '';
+        let isSelected = (game.selected && game.selected.row === i && game.selected.col === j) ? ' selected' : '';
         let moveDest = (game.selected && game.selected.isValidMove(i,j)) ? ' move-dest' : '';
         let canCapture = (moveDest && squarePiece) ? `${squarePiece}-capt` : '';
         // console.log('currSqPiece: ', squarePiece);
