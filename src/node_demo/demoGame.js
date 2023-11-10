@@ -1,5 +1,5 @@
 
-const {chessGame} = require("./gamepieces");
+const {ChessGame} = require("./gamepieces");
 const {parseShorthand} = require("./parseShorthand");
 // import {chessGame, chessPiece, rook} from "./gamepieces.js"
 // import parseShorthand from ".parseShorthand.js"
@@ -11,7 +11,7 @@ const DEMO_MIDDLE_KNIGHT = "8/8/8/3N4/5r2/8/8/8";
 const DEMO_MIDDLE_QUEEN = "6r1/8/8/3Q4/5r2/8/8/8";
 
 let startingPieces = parseShorthand(DEMO_SIMPLE_BISHOP);
-let myGame = new chessGame();
+let myGame = new ChessGame();
 myGame.addPieces(startingPieces);
 
 

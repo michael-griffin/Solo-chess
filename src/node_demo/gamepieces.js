@@ -35,7 +35,7 @@ Chess Board Initialization
 
 const BOARD_SIZE = 8;
 
-class chessGame {
+class ChessGame {
     constructor(){
         //set-up an 8x8 board.
         let newBoard = Array(BOARD_SIZE).fill(undefined);
@@ -63,29 +63,24 @@ class chessGame {
         for (let {type, color, row, col} of pieceArr){
             switch (type) {
                 case 'pawn':
-                    this.board[row][col] = new pawn(color, row, col);
+                    this.board[row][col] = new Pawn(color, row, col);
                     break;
                 case 'bishop':
-                    this.board[row][col] = new bishop(color, row, col);
+                    this.board[row][col] = new Bishop(color, row, col);
                     break;
                 case 'knight':
-                    this.board[row][col] = new knight(color, row, col);
+                    this.board[row][col] = new Knight(color, row, col);
                     break;
                 case 'rook':
-                    this.board[row][col] = new rook(color, row, col);
+                    this.board[row][col] = new Rook(color, row, col);
                     break;
                 case 'king':
-                    this.board[row][col] = new king(color, row, col);
+                    this.board[row][col] = new King(color, row, col);
                     break;
                 case 'queen':
-                    this.board[row][col] = new queen(color, row, col);
+                    this.board[row][col] = new Queen(color, row, col);
                     break;
             }
-            /*
-            if (type == 'rook'){
-                this.board[row][col] = new rook(color, row, col);
-            } //else if
-            */
         }
         this.updatePiecesList();
         this.getAllLegalMoves();
@@ -169,7 +164,7 @@ class chessGame {
     }
 }
 
-class chessPiece {
+class ChessPiece {
     constructor(color, row, col){
         this.color = color;
         this.row = row;
@@ -197,7 +192,7 @@ class chessPiece {
     }
 }
 
-class rook extends chessPiece {
+class Rook extends ChessPiece {
     //Need constructor super call here?
 
     /** Store an array of legal moves. Used when board tries to move piece:
@@ -248,11 +243,9 @@ class rook extends chessPiece {
     }
 }
 
-class bishop extends chessPiece {
+class Bishop extends ChessPiece {
 
     getLegalMoves(board){
-        console.log('got to bishop getLegalMoves');
-        console.log('row and col', this.row, this.col)
         let legalMoves = [];
         let possMoves = []; //first add according to move rules, then check against
         //Given a position, check:
@@ -313,7 +306,7 @@ class bishop extends chessPiece {
     }
 }
 
-class knight extends chessPiece {
+class Knight extends ChessPiece {
 
     getLegalMoves(board){
         let cpos = [this.row, this.col];
@@ -340,7 +333,7 @@ class knight extends chessPiece {
 }
 
 
-class pawn extends chessPiece {
+class Pawn extends ChessPiece {
 
     getLegalMoves(board){
         let legalMoves = [];
@@ -399,15 +392,15 @@ class pawn extends chessPiece {
     }
 }
 
-class queen extends chessPiece {
+class Queen extends ChessPiece {
 
     /** Reuses rook/bishop functions. Each writes columns/diagonals
      * to this.legalMoves, so we call rook's getMoves for the columns,
      * save them, then concatenate with the diagonals from bishop's getMoves
      */
     getLegalMoves(board){
-        const rookPiece = new rook();
-        const bishopPiece = new bishop();
+        const rookPiece = new Rook();
+        const bishopPiece = new Bishop();
         const getColumns = rookPiece.getLegalMoves.bind(this, board);
         const getDiagonals = bishopPiece.getLegalMoves.bind(this, board);
 
@@ -421,7 +414,7 @@ class queen extends chessPiece {
     }
 }
 
-class king extends chessPiece {
+class King extends ChessPiece {
 
     getLegalMoves(board){
         let legalMoves = [];
@@ -438,25 +431,21 @@ class king extends chessPiece {
         ];
         legalMoves = possmoves.slice(0);
 
-        //TODO: rewrite pair, destructure to row/col];
-        legalMoves.filter(pair =>{
+        legalMoves.filter(([row, col]) =>{
             let keepMove = true;
-            if (pair[0] >= 0 && pair[0] <= 7 && pair[1] >= 0 && pair[1] <= 7){
-                let destpiece = board[pair[0]][pair[1]];
-                if (destpiece && destpiece.color == this.color) keep = false;
+            if (row >= 0 && row <= 7 && col >= 0 && col <= 7){
+                let destpiece = board[row][col];
+                if (destpiece && destpiece.color == this.color) keepMove = false;
             } else {
                 keepMove = false;
             }
             return keepMove;
         })
+
         this.legalMoves = legalMoves;
     }
 }
 
-
 module.exports = {
-    chessGame: chessGame,
-    chessPiece: chessPiece,
-    rook: rook,
-    bishop: bishop
+    ChessGame: ChessGame,
 }

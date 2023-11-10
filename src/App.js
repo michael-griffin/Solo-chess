@@ -2,12 +2,12 @@ import React from "react"
 import {useState} from "react"
 import LeftNav from "./LeftNav"
 import BoardSidebar from "./BoardSidebar"
-import {chessGame, chessPiece, rook} from "./gamepieces.js"
+import {ChessGame} from "./gamepieces.js"
 import parseShorthand from "./utils/parseShorthand.js"
 
 //Odd error: breaks when bishop is added to final row.
 const DEMO_START_BISHOP = "B5r1/8/8/8/8/8/8/8";
-const DEMO_MIDDLE_KNIGHT = "8/8/8/3N4/5r2/8/8/8";
+const DEMO_MIDDLE_KNIGHT = "8/8/8/3K4/5r2/8/8/8";
 const DEMO_MIDDLE_QUEEN = "6r1/8/8/3Q4/5r2/8/8/8";
 const STANDARD_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
@@ -42,12 +42,12 @@ function App() {
 
   let [gameMode, setGameMode] = useState('solo-chess'); //or puzzle, or...
 
-  let currentGame = new chessGame;
-  const startingPieces = parseShorthand(DEMO_MIDDLE_QUEEN);
+  let startOfGame = new ChessGame;
+  const startingPieces = parseShorthand(DEMO_START_BISHOP);
   console.log(startingPieces);
-  currentGame.addPieces(startingPieces);
+  startOfGame.addPieces(startingPieces);
 
-  let [gameState, setGameState] = useState(currentGame);
+  let [gameState, setGameState] = useState(startOfGame);
 
   let handleSquareClick = (evt) => {
     let coordString = evt.target.classList[0]; //meta tag, has board position.
@@ -59,7 +59,6 @@ function App() {
         //SHOULD IN THEORY MAKE A COPY. Otherwise this gets messy fast.
         let gameStateNow = Object.assign(Object.create(Object.getPrototypeOf(prevGameState)),prevGameState);
         gameStateNow.selected = currPiece;
-        //console.log('Made selection. current gameState is:', gameStateNow);
         return gameStateNow;
       }))
     };
@@ -82,7 +81,7 @@ function App() {
         gameStateNow.selected = null;
         gameStateNow.selectedMoves = [];
 
-        //console.log('Cleared selection. current gameState is:', gameStateNow);
+        //console.log('moved piece. current gameState is:', gameStateNow);
         return gameStateNow;
       });
     };
@@ -133,6 +132,7 @@ function App() {
 
         let squareClasses = squareCoords + " square " + squareColor + squarePiece +
         isSelected + moveDest + canCapture;
+        squareClasses = squareClasses.toLowerCase();
 
         //build JSX, push to the array that becomes the displayed board once gridified.
         let squareJSX = <div key={'square-'+i+j} className={squareClasses}
@@ -203,7 +203,8 @@ export default App;
       return squarePiece;
     }
 
-/*
+// Below are row/column labels for board.
+
 <svg viewBox="0 0 100 100" class="coordinates">
   <text x="0.75" y="3.5" font-size="2.8" class="coordinate-light">8</text>
   <text x="0.75" y="15.75" font-size="2.8" class="coordinate-dark">7</text>
@@ -223,9 +224,3 @@ export default App;
   <text x="97.5" y="99" font-size="2.8" class="coordinate-light">h</text>
 </svg>
 */
-// let startingPieces = [
-//   {type: 'rook', color: 'white', row: 0, col: 0},
-//   {type: 'rook', color: 'white', row: 7, col: 7},
-//   {type: 'rook', color: 'black', row: 7, col: 4},
-//   {type: 'rook', color: 'black', row: 5, col: 0}
-// ];
