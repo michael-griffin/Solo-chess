@@ -401,8 +401,23 @@ class pawn extends chessPiece {
 
 class queen extends chessPiece {
 
+    /** Reuses rook/bishop functions. Each writes columns/diagonals
+     * to this.legalMoves, so we call rook's getMoves for the columns,
+     * save them, then concatenate with the diagonals from bishop's getMoves
+     */
     getLegalMoves(board){
+        const rookPiece = new rook();
+        const bishopPiece = new bishop();
+        const getColumns = rookPiece.getLegalMoves.bind(this, board);
+        const getDiagonals = bishopPiece.getLegalMoves.bind(this, board);
 
+        getColumns();
+        let allLegalMoves = structuredClone(this.legalMoves);
+
+        getDiagonals();
+        allLegalMoves = [...allLegalMoves, ...this.legalMoves];
+
+        this.legalMoves = allLegalMoves;
     }
 }
 
@@ -422,19 +437,22 @@ class king extends chessPiece {
             [cpos[0]+1,cpos[1]+1]   //down right
         ];
         legalMoves = possmoves.slice(0);
+
+        //TODO: rewrite pair, destructure to row/col];
         legalMoves.filter(pair =>{
-            let keep = true;
+            let keepMove = true;
             if (pair[0] >= 0 && pair[0] <= 7 && pair[1] >= 0 && pair[1] <= 7){
                 let destpiece = board[pair[0]][pair[1]];
                 if (destpiece && destpiece.color == this.color) keep = false;
             } else {
-                keep = false;
+                keepMove = false;
             }
-            return keep;
+            return keepMove;
         })
         this.legalMoves = legalMoves;
     }
 }
+
 
 export {
     chessGame,

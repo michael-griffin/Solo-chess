@@ -8,6 +8,7 @@ const {parseShorthand} = require("./parseShorthand");
 // const DEMO_SIMPLE_BISHOP = "6r1/8/8/3B4/8/8/8/8";
 const DEMO_CORNER_KNIGHT = "N7/2r5/8/8/8/8/8/8";
 const DEMO_MIDDLE_KNIGHT = "8/8/8/3N4/5r2/8/8/8";
+const DEMO_MIDDLE_QUEEN = "6r1/8/8/3Q4/5r2/8/8/8";
 
 let startingPieces = parseShorthand(DEMO_SIMPLE_BISHOP);
 let myGame = new chessGame();

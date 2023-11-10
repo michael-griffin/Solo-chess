@@ -8,6 +8,7 @@ import parseShorthand from "./utils/parseShorthand.js"
 //Odd error: breaks when bishop is added to final row.
 const DEMO_START_BISHOP = "B5r1/8/8/8/8/8/8/8";
 const DEMO_MIDDLE_KNIGHT = "8/8/8/3N4/5r2/8/8/8";
+const DEMO_MIDDLE_QUEEN = "6r1/8/8/3Q4/5r2/8/8/8";
 const STANDARD_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
 //TODO: current issue: bishop's internal position keeps getting reset to 0,0
@@ -42,7 +43,7 @@ function App() {
   let [gameMode, setGameMode] = useState('solo-chess'); //or puzzle, or...
 
   let currentGame = new chessGame;
-  const startingPieces = parseShorthand(DEMO_START_BISHOP);
+  const startingPieces = parseShorthand(DEMO_MIDDLE_QUEEN);
   console.log(startingPieces);
   currentGame.addPieces(startingPieces);
 
