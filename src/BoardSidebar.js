@@ -117,14 +117,12 @@ function BoardSidebar() {
     )
   }
 
-  let numLevels = 10;
-  let perLevel = 3;
+
   let checkboxesJSX;
-  let difficultiesJSX;
   if (!isLoading){
-    numLevels = levels.length;
-    let numDiffs = difficulties.length;
-    perLevel = numLevels/numDiffs;
+    const numLevels = levels.length;
+    const numDiffs = difficulties.length;
+    const perLevel = numLevels/numDiffs;
     checkboxesJSX = writeCheckBoxesJSX(perLevel, numDiffs); //2 by 5 array, 1 extra row for headers.
   }
 
