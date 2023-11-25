@@ -318,7 +318,7 @@ class Knight extends ChessPiece {
             [cpos[0]+1, cpos[1]-2], [cpos[0]-1, cpos[1]-2], //up 2 right 1, up 2 left 1
         ]; //arr of pairs.
         let legalMoves = possmoves.slice(0); //copy, then we'll filter down
-        legalMoves.filter(pair => {
+        legalMoves = legalMoves.filter(pair => {
             let keep = true;
             if (pair[0] >= 0 && pair[0] <= 7 && pair[1] >= 0 && pair[1] <= 7){ //if in bounds of board.
                 let destpiece = board[pair[0]][pair[1]];
@@ -327,7 +327,7 @@ class Knight extends ChessPiece {
                 keep = false;
             }
             return keep;
-        })
+        });
         this.legalMoves = legalMoves;
     }
 }

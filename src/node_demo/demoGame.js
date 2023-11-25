@@ -4,6 +4,7 @@ const {parseShorthand} = require("./parseShorthand");
 // import {chessGame, chessPiece, rook} from "./gamepieces.js"
 // import parseShorthand from ".parseShorthand.js"
 
+const DEMO_FULL_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 const DEMO_START_BISHOP = "B5r1/8/8/8/8/8/8/8";
 const DEMO_MIDDLE_BISHOP = "6r1/8/8/3B4/8/8/8/8";
 const DEMO_CORNER_KNIGHT = "N7/2r5/8/8/8/8/8/8";
