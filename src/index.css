@@ -95,7 +95,7 @@ button {
 main {
   padding: 16px;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 60px;
 }
 
