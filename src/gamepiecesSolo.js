@@ -1,21 +1,28 @@
 /*
-//FIXME: solochess has 3 primary rules that differ from regular chess:
-//white pieces can take their own color
-//The king must remain
+//TODO: solochess has 4 primary rules that differ from regular chess:
+//white pieces can take their own color (done)
+//The king must remain (done)
 //Each piece can only move twice, after the 2nd it switches to black and is
-//unselectable.
+//unselectable. (done)
+//INCOMPLETE: every move must be a capture
 
 
 //TODO: How to add a take back command?
 - Hard part is keeping 'move history' of pieces intact. In that sense,
 - taking one piece and 'moving it back' + decrementing moveCount is better
 - that rebuilding from scratch?
-
 Worked on one implementation for movePiece + undoMove. Still needs work.
+
 
 //TODO: Add start position (in shorthand to constructor)
 //Add reset game method.
 //For both, will likely need to import parseShorthand.
+
+
+//TODO: implement checks (for other game modes)
+//Idea for check is to try a move for legality, then check through
+//all opponents moves: if one leads to capture of king, invalid move.
+
 
 
 chessGame:   contains board + functions to change it
@@ -53,15 +60,10 @@ class ChessGame {
         this.piecesWhite = []; //may also want separate arrays, 1 for white, 1 black.
         this.piecesBlack = [];
 
-        this.prevStart = []; //previous piece, prior to it moving.
-        this.prevDest = []; //previous piece, after it moved.
-
         //History of previous moves.
         //records start Position/finish Position, and the captured piece (if any)
         //that was at finish position before the move occurred.
         this.prevMoves = []; //of the form {start: [0,0], finish: [0,7], captured: Piece}
-
-        //Idea for check is to try a move for legality, then check through all opponents moves: if one leads to capture of king, invalid move.
     }
 
     addPieces(pieceArr){
@@ -97,11 +99,11 @@ class ChessGame {
         this.getAllLegalMoves();
     }
 
-    //TODO: have onClick events trigger selectPiece;
-    /** Selects a piece. Triggered on click. */
-    selectPiece(row, col){
-        this.selected = this.board[row][col];
-    }
+    // //TODO: have onClick events trigger selectPiece;
+    // /** Selects a piece. Triggered on click. */
+    // selectPiece(row, col){
+    //     this.selected = this.board[row][col];
+    // }
 
     /** Checks if there is a selected piece.
      * If so, checks whether selected piece has a valid move at destRow, destCol
@@ -130,10 +132,7 @@ class ChessGame {
         let newPiece = Object.assign(Object.create(Object.getPrototypeOf(selectedPiece)), selectedPiece);
         newPiece.updatePos(destRow, destCol);
 
-        // //Update game's previous move properties with pre + post move positions
-        // this.prevStart.push(selectedPiece);
-        // this.prevDest.push(newPiece);
-        console.log('prevMoves pre-update is:', this.prevMoves);
+        // console.log('prevMoves pre-update is:', this.prevMoves);
 
         //FIXME: captured is not staying constant. Below was one attempt to fix
         //Will need an alternative.
@@ -164,7 +163,8 @@ class ChessGame {
 
         this.updatePiecesList();
         this.getAllLegalMoves();
-        console.log('prevMoves post-update is:', this.prevMoves);
+        // console.log('prevMoves post-update is:', this.prevMoves);
+        console.log('board state is: ', this.board);
     }
 
     undoMove() {
@@ -233,7 +233,7 @@ class ChessPiece {
         this.legalMoves = [];
     }
     updatePos(destRow, destCol){
-        console.log('updating piece position, new row-col:', destRow, destCol);
+        //console.log('updating piece position, new row-col:', destRow, destCol);
         this.row = destRow;
         this.col = destCol;
         this.moved = this.moved + 1;
@@ -241,7 +241,7 @@ class ChessPiece {
         if (this.moved >= 2) this.color = 'black';
     }
     undoMove(prevRow, prevCol){
-        console.log('taking back move, returning to:', prevRow, prevCol);
+        //console.log('taking back move, returning to:', prevRow, prevCol);
         this.row = prevRow;
         this.col = prevCol;
         this.moved = this.moved - 1;

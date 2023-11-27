@@ -3,16 +3,22 @@ import { BrowserRouter } from "react-router-dom";
 import LeftNav from "./LeftNav"
 import RoutesList from "./RoutesList";
 
-//FIXME: current issue: when moving pieces, position logged is inconsistent.
-//Using DEMO_START_BISHOP, moving bishop to the middle will appear
-//to log the correct position (and the screen will update correctly).
-//However, on reselecting piece, it's initial position is logged. This will
-//'correct' itself on the next move.
 
-//This doesn't seem to be an issue in the node demo, which makes me worried
-// I'm not updating state correctly here. I'm using a somewhat unusual pattern
-// that came from stack overflow (Ctrl+F Object.assign in SoloGameBoard/gamepiecesSolo)
-// -- if there's a better alternative I'd love to know.
+//At some point, the below issue got fixed. I'm not sure WHAT fixed it, and am
+//still uncertain if the pattern I've been using -- rebuilding state with Object.assign
+//is sufficient. My worry is that when I'm updating the game board I could be
+//mutating state rather than reassigning it; I'm curious if I should switch
+//to something like deep clone, or use a library like immer.
+
+//To see the pattern I'm worried about, you can check SoloGameBoard
+//(Ctrl+F Object.assign)
+
+
+//FIXME: past issue: when moving pieces, position logged is inconsistent.
+//moving a piece to the middle will display properly, and log the correct position
+
+//However, on reselecting piece, its initial position would be logged. This will
+//'correct' itself on the next move. This is now fixed?
 
 
 /**
