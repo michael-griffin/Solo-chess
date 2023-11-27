@@ -1,32 +1,30 @@
-import React, {useState, useEffect} from "react";
-import Papa from 'papaparse';
+import React from "react";
 import CheckBox from "./CheckBox";
 
-  //Most of this stuff will vary depending on menu type chosen.
-  //Will have distinct sidebars for:
-    //Solo Chess
-      //for buttons, has 2: Take back move + retry level.
-    //Puzzles
-      //for buttons, has a hint that morphs to a 'move' button.
-    //Opening Practice
-    //Default/Main?
+/**
+ * Sidebar for SoloChess minigame. Includes level select/progress checkboxes.
+ * Also has a panel for skipping levels, undoing moves, retrying levels,
+ * resetting the game, and viewing the rules. Most buttons still need work.
+ *
+ * Props:
+ * - levels: list of levels. includes #, diff, start position, and whether completed
+ * - difficulties: derived from levels, there are 3 levels per difficulty.
+ * - setCurrentLevel/setLevels/setGame: set state made in SoloChess
+ *
+ * SoloChess -> SoloSidebar
+ */
 
-//Currently building Solo Chess
-const SOLO_FILEPATH = 'data/gamelevels.csv';
-
-
-//More JS way of doing things is to have an array of objects:
-//{level: 1, difficulty: 1, startPosition: 'asd', completed: false}
-function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}) {
+function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}) {
 
 
-  let writeCheckBoxesJSX = (perLevel, numDiffs) => {
+  function writeCheckBoxesJSX (perLevel, numDiffs) {
     let checkboxGrid = [];
 
     let rowSquares = [];
     for (let j = 1; j <= numDiffs; j++){
       let checkboxHeader = <div key={"checkbox-header-" + j} className="checkbox-header">
-        {j}</div>;
+        {j}
+      </div>;
       rowSquares.push(checkboxHeader)
     }
     let checkBoxRow = <div key={"checkbox-header-row"} className="checkbox-row">
@@ -42,13 +40,13 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
         let checkboxSquare;
         if (levels[i].completed) {
           checkboxSquare = <div
-            key={"checkbox-square-" + (i*j + j)}
+            key={"checkbox-square-" + count}
             className="checkbox-square">
               <CheckBox />
             </div>;
         } else {
           checkboxSquare = <div
-            key={"checkbox-square-" + (i*j + j)}
+            key={"checkbox-square-" + count}
             className="checkbox-square">
             </div>;
         }
@@ -65,8 +63,6 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
   };
 
 
-
-
   let checkboxesJSX;
   const numLevels = levels.length;
   const numDiffs = difficulties.length;
@@ -74,12 +70,12 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
   checkboxesJSX = writeCheckBoxesJSX(perLevel, numDiffs); //2 by 5 array, 1 extra row for headers.
 
 
-  //reset game board to starting position.
+  //TODO: reset game board to starting position.
   function retryLevel(){
 
   }
 
-  //Undo most recent move
+  //TODO: Undo most recent move
   function takeBackMove(){
 
   }
@@ -101,7 +97,7 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
     setCurrentLevel(prev => (prev === levels.length - 1) ? 0 : prev + 1); //no update of levels state with completed.
   }
 
-  //Open a popup that displays rules for solo chess mini game.
+  //TODO: Open a popup that displays rules for solo chess mini game.
   function displayRules(){
 
   }
@@ -110,7 +106,7 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
     <aside className="board-sidebar">
       <div className="sidebar-head">
         <h2 className="sidebar-head-text" >Solo Chess</h2>
-        <img className="sidebar-head-icon" src="icons/solochess.png"></img>
+        <img className="sidebar-head-icon" src="icons/solochess.png" alt="sidebar-icon" />
       </div>
 
       <div className="sidebar-body">
@@ -146,5 +142,3 @@ function SoloSidebar({levels, difficulties, setGame, setCurrentLevel, setLevels}
 
 
 export default SoloSidebar;
-
-          {/* <option value="challenge">Challenge Mode</option> */}

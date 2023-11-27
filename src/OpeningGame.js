@@ -2,7 +2,7 @@
 function OpeningGame(){
 
   return (
-    <div>Openings section still being built</div>
+    <div>Openings section still being worked on</div>
   )
 }
 

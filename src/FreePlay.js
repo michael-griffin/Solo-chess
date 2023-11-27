@@ -2,7 +2,7 @@
 function FreePlay(){
 
   return (
-    <div>FreePlay still being worked on :/</div>
+    <div>FreePlay still being built</div>
   )
 }
 

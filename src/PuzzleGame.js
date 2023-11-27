@@ -2,7 +2,7 @@
 function PuzzleGame(){
 
   return (
-    <div>Puzzles still being worked on :/</div>
+    <div>Puzzles still being built</div>
   )
 }
 

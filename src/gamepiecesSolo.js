@@ -5,40 +5,35 @@
 //Each piece can only move twice, after the 2nd it switches to black and is
 //unselectable.
 
+
+//TODO: How to add a take back command?
+- Hard part is keeping 'move history' of pieces intact. In that sense,
+- taking one piece and 'moving it back' + decrementing moveCount is better
+- that rebuilding from scratch?
+
+Worked on one implementation for movePiece + undoMove. Still needs work.
+
 //TODO: Add start position (in shorthand to constructor)
 //Add reset game method.
 //For both, will likely need to import parseShorthand.
+
 
 chessGame:   contains board + functions to change it
     initialized as empty board.
 
 chessGame methods:
     addPieces(): add pieces from pieceArr to board (each element has type,color,row,col)
+    movePiece(): moves piece, updates previous moves, and rechecks legal moves
     getAllLegalMoves(): cycle through all pieces, and call getLegalMoves()
+    updatePiecesList(): keep game piece list up to date as pieces are captured
 
 Pieces:
-Currently: classes for each piece
-    attributes include: type, color, row + col
+Piece attributes: type, color, row + col
         Also: whether has moved + legalmoves
 
 Piece methods:
     getLegalMoves(): returns array of row/col spaces that they could take.
 
-
-    //after each move, recheck all legal moves (one or both colors?)
-    //this will update legalMoves property on each piece
-    //Means that, if trying to select:
-        //Can stop select attempt if no legal moves
-        //Can immediately display legal moves if selected
-
-    //Currently, legal moves mostly works (handling blocks captures in theory)
-        //Except for Check
-        //Simplest way is to check all legal moves for opposite color
-        //If a move captures the king, stop checking and skip including moves
-        //Checkmate could read as all pieces of a color having no legal moves.
-
-
-Chess Board Initialization
 
 */
 
@@ -60,6 +55,11 @@ class ChessGame {
 
         this.prevStart = []; //previous piece, prior to it moving.
         this.prevDest = []; //previous piece, after it moved.
+
+        //History of previous moves.
+        //records start Position/finish Position, and the captured piece (if any)
+        //that was at finish position before the move occurred.
+        this.prevMoves = []; //of the form {start: [0,0], finish: [0,7], captured: Piece}
 
         //Idea for check is to try a move for legality, then check through all opponents moves: if one leads to capture of king, invalid move.
     }
@@ -130,9 +130,30 @@ class ChessGame {
         let newPiece = Object.assign(Object.create(Object.getPrototypeOf(selectedPiece)), selectedPiece);
         newPiece.updatePos(destRow, destCol);
 
-        //Update game's previous move properties with pre + post move positions
-        this.prevStart.push(selectedPiece);
-        this.prevDest.push(newPiece);
+        // //Update game's previous move properties with pre + post move positions
+        // this.prevStart.push(selectedPiece);
+        // this.prevDest.push(newPiece);
+        console.log('prevMoves pre-update is:', this.prevMoves);
+
+        //FIXME: captured is not staying constant. Below was one attempt to fix
+        //Will need an alternative.
+        // let capturedPiece = this.board[destRow][destCol];
+        // if (capturedPiece){
+        //     capturedPiece = Object.assign(Object.create(Object.getPrototypeOf(capturedPiece)), capturedPiece);
+        // } else {
+        //     capturedPiece = undefined;
+        // }
+        // console.log("captured Piece is: ", capturedPiece);
+
+        const prevMove = {
+            start: [startRow, startCol],
+            finish: [destRow, destCol],
+            captured: this.board[destRow][destCol],
+            // captured: capturedPiece
+        }
+
+        //push would make more sense, but gets interfered with from strict mode.
+        this.prevMoves = [...this.prevMoves, prevMove]; //.push(prevMove);
 
         //Update game board, clear selection, and recalculate legal moves.
         this.board[startRow][startCol] = undefined;
@@ -140,6 +161,33 @@ class ChessGame {
 
         this.selected = null;
         this.selectedMoves = [];
+
+        this.updatePiecesList();
+        this.getAllLegalMoves();
+        console.log('prevMoves post-update is:', this.prevMoves);
+    }
+
+    undoMove() {
+        if (this.prevMoves.length === 0) {
+            console.log('no moves to undo');
+            return;
+        }
+
+        this.selected = null;
+        this.selectedMoves = [];
+
+        let prevMove = this.prevMoves.pop(); //{start: [0,0], finish: [0,7]}
+        let {start: [prevRow, prevCol],
+            finish: [currRow, currCol],
+            captured: capturedPiece} = prevMove;
+
+        let currPiece = this.board[currRow][currCol];
+        if (currPiece === null) throw new Error("Can't find piece from previous move history");
+
+        currPiece.undoMove(prevRow, prevCol);
+        this.board[prevRow][prevCol] = currPiece;
+
+        this.board[currRow][currCol] = capturedPiece;
 
         this.updatePiecesList();
         this.getAllLegalMoves();
@@ -191,6 +239,15 @@ class ChessPiece {
         this.moved = this.moved + 1;
         //New to solo chess: Switch to black if this.moved >=2
         if (this.moved >= 2) this.color = 'black';
+    }
+    undoMove(prevRow, prevCol){
+        console.log('taking back move, returning to:', prevRow, prevCol);
+        this.row = prevRow;
+        this.col = prevCol;
+        this.moved = this.moved - 1;
+        if (this.moved >= 2) this.color = 'black';
+        else if (this.moved < 0) throw new Error("cannot move back further than start pos");
+        else this.color = 'white';
     }
     isValidMove(destRow, destCol){
         let validMove = false; //check if Piece's legalMoves array contains destPos;
@@ -396,29 +453,8 @@ class Pawn extends ChessPiece {
                 //If piece is pawn + prev-move was (first) pawn-move AND directly to right or left
 
             }
-        } else { //if black start at top and moving DOWN (+row)
-            // if (this.row < 7 ) { //If 1 in front.
-            //     //Move up 1.
-            //     frontpiece = board[this.row+1][this.col];
-            //     if (!frontpiece) legalMoves.push([this.row+1, this.col]);
-            //     //Move up 2.
-            //     if (this.row < 6 && this.moved === 0){ //if two in front.
-            //         front2piece = board[this.row+2][this.col];
-            //         if (!front2piece) legalMoves.push([this.row+2, this.col]);
-            //     }
-
-            //     //Take enemy pieces.
-            //     if (this.col > 0){ //if not upper left
-            //         leftpiece = board[this.row+1][this.col-1];
-            //         if (leftpiece && leftpiece.color !== this.color) legalMoves.push([this.row+1, this.col-1]);
-            //     }
-            //     if (this.col < 7){ //if not upper right
-            //         rightpiece = board[this.row+1][this.col+1];
-            //         if (rightpiece && rightpiece.color !== this.color) legalMoves.push([this.row+1, this.col+1]);
-            //     }
-
-            //     //En Passant?
-            // }
+        } else {
+            //can't select black in solo chess
         }
         this.legalMoves = legalMoves;
     }

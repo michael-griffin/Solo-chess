@@ -11,22 +11,15 @@ import RoutesList from "./RoutesList";
 
 //This doesn't seem to be an issue in the node demo, which makes me worried
 // I'm not updating state correctly here. I'm using a somewhat unusual pattern
-// that came from stack overflow -- if there's a better alternative I'd love to know.
+// that came from stack overflow (Ctrl+F Object.assign in SoloGameBoard/gamepiecesSolo)
+// -- if there's a better alternative I'd love to know.
 
-/*
-//Still to do:
-
-//Improvements:
-  //Could update gamepieces.js to standardize possible moves.
-  //currently images are living in two spots. LeftNav uses public/icons, piece imgs are from src/piece-icons.
-
-
-*/
 
 /**
- * App desc
- * state
- * component -> component
+ * Hub to play solo chess minigame, practice openings, or solve chess puzzles.
+ * Puzzles/Openings still far off.
+ *
+ * App -> RoutesList -> SoloChess (or, eventually, puzzles/openings )
  */
 function App() {
 

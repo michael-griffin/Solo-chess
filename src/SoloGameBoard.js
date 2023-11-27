@@ -1,12 +1,17 @@
-import React, { useState } from "react";
-
+import React from "react";
 
 /**
- * Desc
- * props
- * state
- * comp -> comp
+ * Displays gameboard, managing piece selection and moves. When one
+ * piece remains, will move to the next level.
+ *
+ * Props:
+ * - game: state made in soloChess. Contains board and methods to modify it
+ * - setGame: modify game state
+ * - completeLevel: update levels (set completed=true), and increment currentLevel
+ *
+ * SoloChess -> SoloGameBoard
  */
+
 function SoloGameBoard({ game, setGame, completeLevel}) {
 
 
@@ -33,7 +38,6 @@ function SoloGameBoard({ game, setGame, completeLevel}) {
       }));
     };
 
-    //TODO: After piece move, check if finished?
     let movePiece = (destRow, destCol) => {
       setGame(prevGame => {
         let gameNow = Object.assign(
@@ -45,7 +49,7 @@ function SoloGameBoard({ game, setGame, completeLevel}) {
         if (gameNow.pieces.length === 1){
           completeLevel();
         }
-        //console.log('moved piece. current game is:', gameNow);
+        // console.log('moved piece. current game is:', gameNow);
         return gameNow;
       });
     };

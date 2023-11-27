@@ -29,6 +29,7 @@ const SOLO_FILEPATH = 'data/datademo.csv';
  */
 function SoloChess() {
   const [isLoading, setIsLoading] = useState(true);
+  //[{level: 1, difficulty: 1, startPosition: '...', completed: false},...]
   const [levels, setLevels] = useState([]);
 
   let difficulties = getDifficulties();
@@ -36,8 +37,7 @@ function SoloChess() {
   const [currentLevel, setCurrentLevel] = useState(null); //index of levels
   const [soloGame, setSoloGame] = useState(null);
 
-  // console.log("made it to solochess, loading is: ", isLoading);
-  // console.log("game is: ", soloGame);
+
   useEffect(() => {
     async function setInitialSoloChessLevels() {
       let rawLevels = await loadCsv(SOLO_FILEPATH);
@@ -57,18 +57,14 @@ function SoloChess() {
         level["completed"] = false;
         return level;
       });
-      // console.log(formattedLevels);
       setLevels(formattedLevels);
       setCurrentLevel(0);
     }
 
-
     setInitialSoloChessLevels();
   }, []);
 
-  /** Update gameboard everytime you complete a level, or on initial load.
-   * TODO: should this be split off outside of a useEffect?
-  */
+  /** Update gameboard everytime you complete a level, or on initial load. */
   useEffect(() => {
     if (currentLevel !== null){
       const startPosition = levels[currentLevel].startPosition;
@@ -94,7 +90,6 @@ function SoloChess() {
 
   /** Increment current level, triggers above useEffect to
    * reset gameBoard, load next level's starting position */
-
   function completeLevel(){
     setLevels(prevLevels => {
       let newLevels = [...prevLevels];
@@ -116,15 +111,10 @@ function SoloChess() {
     <>
       <SoloGameBoard game={soloGame} setGame={setSoloGame} completeLevel={completeLevel} />
       <SoloSidebar levels={levels} difficulties={difficulties}
-        setGame={setSoloGame} setCurrentLevel={setCurrentLevel} setLevels={setLevels}/>
+        setCurrentLevel={setCurrentLevel} setLevels={setLevels} setGame={setSoloGame} />
     </>
   )
 
 }
-    // <>
-
-    //   <SoloGameBoard game={soloGame} setGame={setSoloGame} updateLevel={updateLevel} loading={isLoading}/>
-    //   <SoloSidebar levels={levels} difficulties={difficulties} setGame={setSoloGame} setLevels={setLevels}/>
-    // </>
 
 export default SoloChess;
