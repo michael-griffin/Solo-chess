@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import CheckBox from "./CheckBox";
-
+import Modal from "./Modal";
 /**
  * Sidebar for SoloChess minigame. Includes level select/progress checkboxes.
  * Also has a panel for skipping levels, undoing moves, retrying levels,
@@ -16,6 +16,7 @@ import CheckBox from "./CheckBox";
 
 function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}) {
 
+  const [isOpen, setIsOpen] = useState(false);
 
   function writeCheckBoxesJSX (perLevel, numDiffs) {
     let checkboxGrid = [];
@@ -97,9 +98,9 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
     setCurrentLevel(prev => (prev === levels.length - 1) ? 0 : prev + 1); //no update of levels state with completed.
   }
 
-  //TODO: Open a popup that displays rules for solo chess mini game.
-  function displayRules(){
-
+  //TODO: Open a popup Modal that displays rules for solo chess mini game.
+  function toggleRules(){
+    setIsOpen(prev => !prev);
   }
 
   return (
@@ -132,7 +133,8 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
         </div>
         <div className="footer-small-button-container">
           <button onClick={resetGame} className="footer-small-button">Reset</button>
-          <button className="footer-small-button">Rules</button>
+          <button className="footer-small-button" onClick={toggleRules}>Rules</button>
+          <Modal isOpen={isOpen} toggle={toggleRules} />
           <button onClick={skipLevel} className="footer-small-button">Skip</button>
         </div>
       </footer>

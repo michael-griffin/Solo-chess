@@ -2,6 +2,7 @@ import React from "react"
 import { BrowserRouter } from "react-router-dom";
 import LeftNav from "./LeftNav"
 import RoutesList from "./RoutesList";
+import SimpleApp from "./modal-demo/SimpleApp";
 
 
 //At some point, the below issue got fixed. I'm not sure WHAT fixed it, and am
@@ -36,6 +37,7 @@ function App() {
         <RoutesList />
       </BrowserRouter>
     </div>
+    // <SimpleApp />
   );
 }
 
