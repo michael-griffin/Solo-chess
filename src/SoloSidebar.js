@@ -73,8 +73,13 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
 
 
   //TODO: reset game board to starting position.
-  function retryLevel(){
-
+  function resetBoard(){
+    setGame(prevGame => {
+      let updatedGame = produce(prevGame, (draft) => {
+        draft.resetBoard();
+      })
+      return updatedGame;
+    })
   }
 
   //TODO: Undo most recent move
@@ -139,7 +144,7 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
 
       <footer className="sidebar-footer">
         <div className="footer-large-button-container">
-          <button className="footer-large-button">Retry</button>
+          <button onClick={resetBoard} className="footer-large-button">Retry</button>
           <button onClick={takeBackMove} className="footer-large-button">Take Back</button>
         </div>
         <div className="footer-small-button-container">

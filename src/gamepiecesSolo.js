@@ -87,29 +87,6 @@ class ChessGame {
         for (let {type, color, row, col} of pieceArr){
             let newPiece = this.createPiece({type, color, row, col});
             this.board[row][col] = newPiece;
-            // switch (type) {
-            //     case 'pawn':
-            //         this.board[row][col] = new Pawn(type, color, row, col);
-            //         break;
-            //     case 'bishop':
-            //         this.board[row][col] = new Bishop(type, color, row, col);
-            //         break;
-            //     case 'knight':
-            //         this.board[row][col] = new Knight(type, color, row, col);
-            //         break;
-            //     case 'rook':
-            //         this.board[row][col] = new Rook(type, color, row, col);
-            //         break;
-            //     case 'king':
-            //         this.board[row][col] = new King(type, color, row, col);
-            //         break;
-            //     case 'queen':
-            //         this.board[row][col] = new Queen(type, color, row, col);
-            //         break;
-            //     default:
-            //         console.log('attempted to add invalid piece');
-            //         break;
-            // }
         }
         this.updatePiecesList();
         this.getAllLegalMoves();
@@ -171,18 +148,6 @@ class ChessGame {
         //(.create) with the prototype of the original.
         let newPiece = Object.assign(Object.create(Object.getPrototypeOf(selectedPiece)), selectedPiece);
         newPiece.updatePos(destRow, destCol);
-
-        // console.log('prevMoves pre-update is:', this.prevMoves);
-
-        //FIXME: captured is not staying constant. Below was one attempt to fix
-        //Will need an alternative.
-        // let capturedPiece = this.board[destRow][destCol];
-        // if (capturedPiece){
-        //     capturedPiece = Object.assign(Object.create(Object.getPrototypeOf(capturedPiece)), capturedPiece);
-        // } else {
-        //     capturedPiece = undefined;
-        // }
-        // console.log("captured Piece is: ", capturedPiece);
 
         console.log(`piece at ${destRow},${destCol} is: ${this.board[destRow][destCol]}` );
 
@@ -252,6 +217,12 @@ class ChessGame {
         this.updatePiecesList();
         this.getAllLegalMoves();
         console.log('board state is: ', this.board);
+    }
+
+    resetBoard() {
+        while (this.prevMoves.length !== 0){
+            this.undoMove();
+        }
     }
 
     updatePiecesList(){
