@@ -1,3 +1,14 @@
+import {immerable, produce} from "immer";
+
+/*1.5
+
+Working on move history (for takeback command, eventually).
+- Immer looks like it's working (previously, 'captured' displayed the currently
+moved piece, not the piece that had been captured)
+- Still need more info to recreate old piece from previous move:
+- May be as simple as adding in
+*/
+
 /*
 //TODO: solochess has 4 primary rules that differ from regular chess:
 //white pieces can take their own color (done)
@@ -47,6 +58,8 @@ Piece methods:
 const BOARD_SIZE = 8;
 
 class ChessGame {
+    [immerable] = true;
+
     constructor(){
         //set-up an 8x8 board.
         let newBoard = Array(BOARD_SIZE).fill(undefined);
@@ -72,38 +85,65 @@ class ChessGame {
             //let startingpieces = [ {type: 'rook', color: 'white', row: 0, col: 0},
             //    {type: 'rook', color: 'black', row: 5, col: 0} ];
         for (let {type, color, row, col} of pieceArr){
-            switch (type) {
-                case 'pawn':
-                    this.board[row][col] = new Pawn(color, row, col);
-                    break;
-                case 'bishop':
-                    this.board[row][col] = new Bishop(color, row, col);
-                    break;
-                case 'knight':
-                    this.board[row][col] = new Knight(color, row, col);
-                    break;
-                case 'rook':
-                    this.board[row][col] = new Rook(color, row, col);
-                    break;
-                case 'king':
-                    this.board[row][col] = new King(color, row, col);
-                    break;
-                case 'queen':
-                    this.board[row][col] = new Queen(color, row, col);
-                    break;
-                default:
-                    break;
-            }
+            let newPiece = this.createPiece({type, color, row, col});
+            this.board[row][col] = newPiece;
+            // switch (type) {
+            //     case 'pawn':
+            //         this.board[row][col] = new Pawn(type, color, row, col);
+            //         break;
+            //     case 'bishop':
+            //         this.board[row][col] = new Bishop(type, color, row, col);
+            //         break;
+            //     case 'knight':
+            //         this.board[row][col] = new Knight(type, color, row, col);
+            //         break;
+            //     case 'rook':
+            //         this.board[row][col] = new Rook(type, color, row, col);
+            //         break;
+            //     case 'king':
+            //         this.board[row][col] = new King(type, color, row, col);
+            //         break;
+            //     case 'queen':
+            //         this.board[row][col] = new Queen(type, color, row, col);
+            //         break;
+            //     default:
+            //         console.log('attempted to add invalid piece');
+            //         break;
+            // }
         }
         this.updatePiecesList();
         this.getAllLegalMoves();
     }
 
-    // //TODO: have onClick events trigger selectPiece;
-    // /** Selects a piece. Triggered on click. */
-    // selectPiece(row, col){
-    //     this.selected = this.board[row][col];
-    // }
+    createPiece({type, color, row, col, moved=0}){
+        let newPiece;
+        switch (type) {
+            case 'pawn':
+                newPiece = new Pawn(type, color, row, col, moved);
+                break;
+            case 'bishop':
+                newPiece = new Bishop(type, color, row, col, moved);
+                break;
+            case 'knight':
+                newPiece = new Knight(type, color, row, col, moved);
+                break;
+            case 'rook':
+                newPiece = new Rook(type, color, row, col, moved);
+                break;
+            case 'king':
+                newPiece = new King(type, color, row, col, moved);
+                break;
+            case 'queen':
+                newPiece = new Queen(type, color, row, col, moved);
+                break;
+            default:
+                console.log('attempted to add invalid piece');
+                break;
+        }
+
+        if (newPiece.moved < 2) newPiece.color = 'white'; //FIXME: exclusive to solo chess
+        return newPiece;
+    }
 
     /** Checks if there is a selected piece.
      * If so, checks whether selected piece has a valid move at destRow, destCol
@@ -144,6 +184,8 @@ class ChessGame {
         // }
         // console.log("captured Piece is: ", capturedPiece);
 
+        console.log(`piece at ${destRow},${destCol} is: ${this.board[destRow][destCol]}` );
+
         const prevMove = {
             start: [startRow, startCol],
             finish: [destRow, destCol],
@@ -151,19 +193,22 @@ class ChessGame {
             // captured: capturedPiece
         }
 
-        //push would make more sense, but gets interfered with from strict mode.
-        this.prevMoves = [...this.prevMoves, prevMove]; //.push(prevMove);
+        //push would make more sense, but would mutate state.
+        this.prevMoves = [...this.prevMoves, prevMove];
 
         //Update game board, clear selection, and recalculate legal moves.
-        this.board[startRow][startCol] = undefined;
-        this.board[destRow][destCol] = newPiece;
+        let newBoard = produce(this.board, (draft) => {
+            draft[startRow][startCol] = undefined;
+            draft[destRow][destCol] = newPiece;
+        })
+        this.board = newBoard;
 
         this.selected = null;
         this.selectedMoves = [];
 
         this.updatePiecesList();
         this.getAllLegalMoves();
-        // console.log('prevMoves post-update is:', this.prevMoves);
+        console.log('prevMoves post-update is:', this.prevMoves);
         console.log('board state is: ', this.board);
     }
 
@@ -176,42 +221,62 @@ class ChessGame {
         this.selected = null;
         this.selectedMoves = [];
 
-        let prevMove = this.prevMoves.pop(); //{start: [0,0], finish: [0,7]}
-        let {start: [prevRow, prevCol],
+        let prevMove = this.prevMoves.slice(-1)[0];
+        this.prevMoves = this.prevMoves.slice(0,-1);
+
+        let {
+            start: [prevRow, prevCol],
             finish: [currRow, currCol],
-            captured: capturedPiece} = prevMove;
+            captured: capturedPiece
+        } = prevMove;
+
 
         let currPiece = this.board[currRow][currCol];
         if (currPiece === null) throw new Error("Can't find piece from previous move history");
+        console.log('currPiece is: ', currPiece);
+        let prevPiece = this.createPiece({
+            ...currPiece,
+            row: prevRow,
+            col: prevCol,
+            moved: currPiece.moved - 1});
 
-        currPiece.undoMove(prevRow, prevCol);
-        this.board[prevRow][prevCol] = currPiece;
+        let newBoard = produce(this.board, (draft) => {
+            draft[prevRow][prevCol] = prevPiece;
+            draft[currRow][currCol] = capturedPiece;
+        })
+        this.board = newBoard;
 
-        this.board[currRow][currCol] = capturedPiece;
+        this.selected = null;
+        this.selectedMoves = [];
 
         this.updatePiecesList();
         this.getAllLegalMoves();
+        console.log('board state is: ', this.board);
     }
 
     updatePiecesList(){
         //after adding in/moving pieces, update this.pieces (and the white/black specific)
-        this.pieces = [];
-        this.piecesWhite = [];
-        this.piecesBlack = [];
+        const pieces = [];
+        const piecesWhite = [];
+        const piecesBlack = [];
 
         for (let i = 0; i < this.board.length; i++){
             let currRow = this.board[i];
             for (let piece of currRow){
                 if (piece){
-                    this.pieces.push(piece);
+                    pieces.push(piece);
                     if (piece.color === 'white'){
-                        this.piecesWhite.push(piece);
+                        piecesWhite.push(piece);
                     } else {
-                        this.piecesBlack.push(piece);
+                        piecesBlack.push(piece);
                     }
                 }
             }
         }
+
+        this.pieces = pieces;
+        this.piecesWhite = piecesWhite;
+        this.piecesBlack = piecesBlack;
     }
 
     getAllLegalMoves(){
@@ -224,7 +289,8 @@ class ChessGame {
 }
 
 class ChessPiece {
-    constructor(color, row, col, moved=0){
+    constructor(type, color, row, col, moved=0,){
+        this.type = type
         this.color = color;
         this.row = row;
         this.col = col;

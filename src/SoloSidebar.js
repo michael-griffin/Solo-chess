@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import produce from "immer";
 import CheckBox from "./CheckBox";
 import Modal from "./Modal";
 /**
@@ -78,7 +79,17 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
 
   //TODO: Undo most recent move
   function takeBackMove(){
-
+    // setGame(prevGame => {
+    //   let newGame = prevGame;
+    //   newGame.undoMove();
+    //   return newGame;
+    // })
+    setGame(prevGame => {
+      let updatedGame = produce(prevGame, (draft) => {
+        draft.undoMove();
+      })
+      return updatedGame;
+    })
   }
 
   function resetGame(){
@@ -129,7 +140,7 @@ function SoloSidebar({levels, difficulties, setCurrentLevel, setLevels, setGame}
       <footer className="sidebar-footer">
         <div className="footer-large-button-container">
           <button className="footer-large-button">Retry</button>
-          <button className="footer-large-button">Take Back</button>
+          <button onClick={takeBackMove} className="footer-large-button">Take Back</button>
         </div>
         <div className="footer-small-button-container">
           <button onClick={resetGame} className="footer-small-button">Reset</button>
